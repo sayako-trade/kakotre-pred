@@ -1,0 +1,2242 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>過去トレ記録シート</title>
+<style>
+:root{
+  --blue:#1565C0;--blue-lt:#E3F2FD;--blue-md:#90CAF9;
+  --red:#C62828;--red-lt:#FFEBEE;--red-md:#EF9A9A;
+  --orange:#E65100;--orange-lt:#FFF3E0;
+  --green:#2E7D32;--green-lt:#E8F5E9;
+  --purple:#6A1B9A;--purple-lt:#F3E5F5;
+  --warn:#F57F17;--warn-lt:#FFF8E1;
+  --gray:#546E7A;--gray-lt:#ECEFF1;
+  --border:#CFD8DC;
+  --bg:#F0F4F8;--card:#FFF;--text:#1A2332;--sub:#607D8B;--muted:#B0BEC5;
+  --shadow:0 1px 4px rgba(0,0,0,.10);
+  --font:'Meiryo','Hiragino Sans','Yu Gothic UI',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:12px;min-width:920px}
+.app{max-width:1600px;margin:0 auto;padding:10px 12px}
+.card{background:var(--card);border-radius:8px;box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden}
+.ch{padding:8px 14px;font-weight:700;font-size:12.5px;background:#F5F7FA;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cb{padding:10px 14px}
+.ctrl-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 14px}
+.ctrl{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.ctrl label{font-weight:700;font-size:12px;color:var(--sub)}
+input[type=number],input[type=text]{font-family:var(--font);font-size:12px;border:1.5px solid var(--border);border-radius:5px;padding:4px 7px;background:#fff;color:var(--text);transition:border-color .15s}
+input[type=number]:focus,input[type=text]:focus{outline:none;border-color:var(--blue)}
+textarea{font-family:var(--font);font-size:11px;border:1.5px solid var(--border);border-radius:5px;padding:6px;resize:vertical;color:var(--text)}
+textarea:focus{outline:none;border-color:var(--blue)}
+.btn{font-family:var(--font);font-size:12px;padding:5px 13px;border:none;border-radius:5px;cursor:pointer;font-weight:700;transition:filter .1s,transform .08s}
+.btn:not(:disabled):hover{filter:brightness(1.08)}
+.btn:not(:disabled):active{transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn-green{background:var(--green);color:#fff}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--sub)}
+.btn-outline:hover{background:var(--gray-lt)}
+.btn-sm{padding:3px 9px;font-size:11px}
+.btn-xs{padding:1px 6px;font-size:10.5px;border-radius:4px}
+.layout{display:flex;gap:10px;align-items:flex-start;min-width:0}
+.left-panel{flex:1 1 auto;min-width:0;overflow-x:hidden}
+.right-panel{flex:0 0 540px;width:540px;min-width:540px}
+.memo-sticky{position:sticky;top:10px;align-self:flex-start}
+
+/* TABLE */
+.table-wrap{overflow-x:auto}
+table.trade{border-collapse:collapse;font-size:11px}
+table.trade th,table.trade td{border:1px solid var(--border);padding:3px 6px;text-align:center;vertical-align:middle;white-space:nowrap}
+table.trade th{background:#F5F7FA;font-weight:700;color:var(--sub);font-size:11px}
+table.trade tr:hover td{background:#FAFCFF}
+table.trade tr.row-ryodate td{background:#F3E5F5!important}
+table.trade tr.row-ryodate:hover td{background:#EDE7F6!important}
+.cd{width:58px}.cp{width:66px}.cdf{width:58px}.cob{width:32px}.cos{width:32px}
+.cs{width:260px;text-align:left!important}.cpr{width:80px}.cpd{width:72px}.chl{width:90px}
+
+
+/* ORDER BTN */
+.ord-btn{width:26px;height:24px;border:1.5px solid var(--border);border-radius:4px;cursor:pointer;font-size:14px;font-weight:900;background:#FAFAFA;display:inline-flex;align-items:center;justify-content:center;transition:all .12s}
+.ob{background:var(--red-lt)!important;border-color:var(--red)!important;color:var(--red)!important}
+.os{background:var(--blue-lt)!important;border-color:var(--blue)!important;color:var(--blue)!important}
+
+/* PRICE */
+.ph{color:transparent;background:#E8EDF2;border-radius:3px;padding:0 4px;user-select:none}
+.up{color:var(--red);font-weight:700}
+.dn{color:var(--blue);font-weight:700}
+
+/* SETTLE */
+.sl{font-size:10.5px}
+.si{display:flex;align-items:center;gap:4px;padding:2px 0;border-bottom:1px solid #F0F4F8;flex-wrap:wrap}
+.si:last-child{border-bottom:none}
+.si.auto-si{background:var(--warn-lt);border-radius:4px;padding:2px 4px;margin:1px 0;border:1px solid #FFE082}
+.tb{color:var(--red);font-weight:900}
+.ts{color:var(--blue);font-weight:900}
+.brm{background:none;border:none;cursor:pointer;color:var(--muted);font-size:10px;padding:0 2px;transition:color .1s}
+.brm:hover{color:var(--red)}
+.auto-tag{font-size:9px;background:var(--warn-lt);color:var(--warn);border:1px solid #FFE082;border-radius:3px;padding:0 3px;font-weight:700}
+.expiry-warn{font-size:9px;color:var(--red);font-weight:700;background:var(--red-lt);border-radius:3px;padding:1px 4px;display:inline-block;margin-left:2px}
+.ryodate-tag{font-size:9px;background:var(--purple-lt);color:var(--purple);border-radius:3px;padding:0 3px;border:1px solid #CE93D8;font-weight:700}
+
+/* SETTLE FORM */
+.sf{background:var(--orange-lt);border:1.5px solid #FFCC80;border-radius:6px;padding:7px 9px;margin-top:4px;font-size:10.5px}
+.sf .pl{border:1px solid var(--border);border-radius:4px;max-height:150px;overflow-y:auto;margin-bottom:6px;background:#fff}
+.rule3-warn{background:var(--warn-lt);border:2px solid #FFB300;border-radius:6px;padding:6px 10px;margin-top:4px;font-size:11px;color:var(--warn);font-weight:700}
+.rule3-ok{font-size:10px;color:var(--green);background:var(--green-lt);border-radius:3px;padding:1px 5px;margin-left:4px}
+.rule3-ng{font-size:10px;color:var(--red);background:var(--red-lt);border-radius:3px;padding:1px 5px;margin-left:4px}
+.pi2{padding:3px 10px;cursor:pointer;display:flex;gap:7px;align-items:center;flex-wrap:nowrap;white-space:nowrap;border-bottom:1px solid #F5F7FA;transition:background .1s}
+.pi2:last-child{border-bottom:none}
+.pi2:hover{background:#F5F7FA}
+.pi2.sel{background:var(--blue-lt)}
+.pi2.expiring{background:#FFF8E1}
+.sf .row2{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.sf .row2 input{width:90px}
+.sf .btns{display:flex;gap:6px}
+.ppos{color:var(--red);font-weight:700}
+.pneg{color:var(--blue);font-weight:700}
+
+/* MEMO GRID */
+.memo-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 14px;background:#F5F7FA;border-bottom:1px solid var(--border)}
+.memo-title{font-size:13px;font-weight:700}
+.memo-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.memo-meta input{width:78px}
+.g-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:10px 14px;min-width:380px}
+.gc{border:2px solid var(--border);border-radius:7px;overflow:hidden;font-size:10px;transition:border-color .2s,box-shadow .2s}
+.gc.cur{border-color:var(--orange)!important;box-shadow:0 0 0 3px #FF980033}
+.gc.done{border-color:#A5D6A7}
+.gh{background:#F5F7FA;padding:3px 7px;font-weight:700;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);font-size:11px}
+.gc.cur .gh{background:var(--orange-lt)}
+.gc.done .gh{background:var(--green-lt);color:var(--green)}
+.gc-cols{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border)}
+.gch{text-align:center;padding:2px 3px;font-weight:700;font-size:10px}
+.gch.buy{color:var(--red);border-right:1px solid var(--border)}
+.gch.sell{color:var(--blue)}
+.gc-rows{display:grid;grid-template-columns:1fr 1fr}
+.gcol{display:flex;flex-direction:column}
+.gcol:first-child{border-right:1px solid #E8EDF2}
+.ge{min-height:22px;padding:2px 5px;border-bottom:1px solid #F0F4F8;display:flex;flex-direction:column;justify-content:center}
+.ge:last-child{border-bottom:none}
+.ge.stl{text-decoration:line-through;color:var(--muted)!important;background:#FAFCFF}
+.ge.stl .gep,.ge.stl .ged{color:var(--muted)!important}
+.ge.stl .ge-fukumi{color:inherit!important;text-decoration:line-through}
+.ge.auto-stl{background:#FFF8E1!important}
+/* 持ち越しスタイル */
+.ge.ge-carry{background:#F0FFF4!important;border-left:2px solid #81C784}
+.ge-carry-badge{font-size:8px;color:var(--green);font-weight:700;line-height:1;margin-bottom:1px}
+.badge-carry{background:#E8F5E9;color:var(--green);border:1px solid #A5D6A7}
+.ged{font-size:9px;color:var(--sub)}
+.gep{font-weight:700;font-size:10.5px}
+.ge.buy-e .gep{color:var(--red)}
+.ge.sell-e .gep{color:var(--blue)}
+.ge-exp{font-size:8px;color:var(--warn);font-weight:700}
+.ge-fukumi{font-size:9px;font-weight:700;line-height:1.2}
+
+/* BOTTOM */
+.bot-row{display:flex;gap:10px;flex-wrap:wrap}
+.bot-row .card{flex:1;min-width:190px}
+.total-bar{display:flex;gap:20px;align-items:center;flex-wrap:wrap;padding:11px 18px}
+.tc{display:flex;align-items:center;gap:8px}
+.tc label{font-weight:700;white-space:nowrap;font-size:12px}
+.tc input{width:115px;text-align:right}
+.tbig{font-size:16px;font-weight:700}
+.op{font-size:20px;font-weight:700;color:var(--muted)}
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:5px}
+.pi3{display:flex;align-items:center;gap:4px;font-size:11px}
+.pi3 label{min-width:38px;color:var(--sub)}
+.pi3 input{width:66px}
+
+/* IMPORT（ペーストのみ） */
+.imp-paste-area{width:100%;height:110px;font-size:11px;font-family:var(--mono,'Courier New',monospace)}
+.imp-hint{font-size:10px;color:var(--sub);margin-bottom:6px;line-height:1.6}
+.imp-stat{font-size:11px;padding:6px 10px;border-radius:5px;margin-top:8px;font-weight:700}
+.imp-stat.ok{background:var(--green-lt);color:var(--green)}
+.imp-stat.err{background:var(--red-lt);color:var(--red)}
+.imp-stat.warn{background:var(--warn-lt);color:var(--warn)}
+.imp-preview{max-height:80px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;margin-top:6px;font-size:10px}
+.imp-prow{display:flex;gap:12px;padding:2px 8px;border-bottom:1px solid #F5F7FA}
+.imp-prow:last-child{border-bottom:none}
+.imp-prow:nth-child(even){background:#FAFBFC}
+.mono{font-family:var(--mono,'Courier New',monospace)}
+.badge{display:inline-block;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700}
+.badge-orange{background:var(--orange-lt);color:var(--orange)}
+.badge-green{background:var(--green-lt);color:var(--green)}
+.tag-note{font-size:10px;color:var(--sub);background:var(--gray-lt);border-radius:4px;padding:1px 6px}
+
+/* EXPIRE BANNER */
+.expire-banner{background:var(--warn-lt);border:2px solid #FFB300;border-radius:8px;padding:9px 14px;margin-bottom:10px;font-size:12px;font-weight:700;color:var(--warn);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.expire-banner .items{font-weight:400;font-size:11px;color:var(--text)}
+
+/* FIXED REVEAL BUTTON */
+.fixed-reveal{position:fixed;bottom:22px;right:22px;z-index:1000;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.fixed-reveal .btn{box-shadow:0 3px 10px rgba(0,0,0,.22);font-size:13px;padding:9px 18px}
+.fixed-reveal .rev-info{font-size:10px;background:rgba(0,0,0,.55);color:#fff;border-radius:5px;padding:2px 8px;white-space:nowrap}
+
+/* KOSAI FIXED */
+.kf-section{padding:8px 14px;border-bottom:1px solid var(--border)}
+.kf-title{font-size:11px;font-weight:700;color:var(--sub);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.kf-row{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:11px;flex-wrap:wrap}
+.kf-badge{font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;white-space:nowrap}
+.kf-rieki{background:var(--green-lt);color:var(--green);border:1px solid #A5D6A7}
+.kf-son{background:var(--red-lt);color:var(--red);border:1px solid var(--red-md)}
+.kf-doji{background:var(--gray-lt);color:var(--gray);border:1px solid var(--border)}
+.kf-amount{font-size:13px;font-weight:700}
+.kf-desc{font-size:10px;color:var(--sub);line-height:1.5}
+.progress-bar{height:10px;background:#E8EDF2;border-radius:5px;overflow:hidden;margin:4px 0}
+.progress-fill{height:100%;border-radius:5px;transition:width .3s}
+.jisa-row{display:flex;align-items:center;gap:6px;padding:2px 5px;font-size:10.5px;border-bottom:1px solid #F5F7FA}
+.jisa-row:last-child{border-bottom:none}
+
+/* SOSAI */
+.sosai-wrap{display:flex;flex-wrap:wrap;gap:8px;padding:8px 14px}
+.sosai-group{flex:1;min-width:160px;max-width:100%}
+.sosai-group-title{font-size:11px;font-weight:700;color:var(--sub);background:#F5F7FA;padding:3px 8px;border-radius:5px;margin-bottom:4px;border-left:3px solid var(--blue);cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.sosai-group-title:hover{background:#EEF2F6}
+.sosai-body{max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;background:#fff}
+.sosai-row{display:flex;align-items:center;gap:5px;padding:2px 5px;border-bottom:1px solid #F0F4F8;font-size:10.5px;flex-wrap:nowrap}
+.sosai-row:last-child{border-bottom:none}
+.sosai-row:hover{background:#FAFCFF}
+.sosai-lbl{font-weight:700;color:var(--sub);min-width:30px;font-size:10px;flex-shrink:0}
+.sosai-pos{display:flex;align-items:center;gap:2px;flex:1;flex-wrap:wrap;font-size:10px}
+.sosai-res{font-size:11px;font-weight:700;text-align:right;min-width:72px;white-space:nowrap;flex-shrink:0}
+.sosai-ok{color:var(--green)}
+.sosai-ng{color:var(--red)}
+.sosai-fix{font-size:9px;margin-left:2px;font-weight:400}
+.sosai-achieved{font-size:9px;color:var(--green);background:var(--green-lt);border-radius:3px;padding:1px 3px;margin-left:2px}
+
+/* PRED STATS */
+.ps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;padding:10px 14px}
+.ps-card{border:1.5px solid var(--border);border-radius:7px;overflow:hidden}
+.ps-head{padding:5px 10px;font-size:11px;font-weight:700;background:#F5F7FA;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.ps-body{padding:6px 10px}
+.ps-row{display:flex;align-items:center;justify-content:space-between;padding:3px 0;border-bottom:1px solid #F5F7FA;font-size:11px}
+.ps-row:last-child{border-bottom:none}
+.ps-bar-wrap{height:8px;background:#E8EDF2;border-radius:4px;overflow:hidden;margin:3px 0}
+.ps-bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.ps-pct{font-size:14px;font-weight:900}
+.ps-n{font-size:10px;color:var(--muted)}
+.ps-rank-s{background:#FFF3E0;border-color:#FFCC80}
+.ps-rank-a{background:#F3F8FF;border-color:#90CAF9}
+.ps-rank-b{background:#F5F7FA;border-color:var(--border)}
+.ps-timeline{padding:8px 14px;border-top:1px solid var(--border)}
+.ps-trow{display:flex;align-items:center;gap:6px;padding:2px 0;font-size:10px}
+.ps-dot-ok{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.ps-dot-ng{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0}
+.ps-dot-sk{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>/* ═══════════════════════ STATE ═══════════════════════ */
+const S = {
+  year:2025,month:1,stock:'',code:'',capital:'',shares:'',
+  prices:{},revealed:0,
+  // orders[dstr] = {buyId:number|null, sellId:number|null}
+  orders:{},
+  // settles[dstr] = [{id,posId,exitPrice,auto?}]
+  settles:{},
+  groups:mkGroups(),
+  // carries[gi] = 移行時にスナップショットした未決済positionのIDリスト
+  carries:Array.from({length:12},()=>[]),
+  gi:0,idc:1,prOpen:false,
+  sfDs:null,selPosArr:[],exitInp:'',
+  fixedOpen:false,jisaOpen:false,
+  rule3On:true,rule3Pct:3,
+  prevP:'',memo:'',fukumi:'',
+
+  // グループ別メモ
+  groupMemos:Array.from({length:12},()=>''),
+  // import
+  impStat:null,
+  pasteText:'',
+  // 外部データ（予測精度向上用）
+  extDow:{},   // NYダウ終値 {YYYY-MM-DD: 終値}
+  extVol:{},   // 銘柄出来高 {YYYY-MM-DD: 出来高}
+  dowPaste:'',volPaste:'',
+  dowStat:null,volStat:null,
+  // OHLCデータ {YYYY-MM-DD: {o,h,l,c}}
+  extOHLC:{},ohlcPaste:'',ohlcStat:null,
+  patternAnalysis:null, // 銘柄固有法則解析結果
+  extMA:{},   // 銘柄MA {YYYY-MM-DD: {ma5,ma25,ma75}}
+  // 統合入力
+  stockPaste:'',stockStat:null,
+  // リアルタイム入力（実トレード用）
+  rtOpen:false,
+  rtDate:'',rtO:'',rtH:'',rtL:'',rtC:'',rtVol:'',rtDow:'',rtStat:null,
+  // 翌日予測履歴 {YYYY-MM-DD: {dir:'up'|'down', chop:number}}
+  predLog:{},
+  predStatsOpen:false
+};
+
+function mkGroups(){return Array.from({length:12},()=>({buys:[],sells:[]}))}
+
+/* ═══════════════════════ HELPERS ═══════════════════════ */
+const NUMS=['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩','⑪','⑫'];
+
+function wds(y,m){
+  const r=[],d=new Date(y,m-1,1);
+  while(d.getMonth()===m-1){if(d.getDay()&&d.getDay()!==6)r.push(new Date(d));d.setDate(d.getDate()+1)}
+  return r;
+}
+function ds(d){return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
+function pad(n){return String(n).padStart(2,'0')}
+function fd(s){if(!s)return '';const[,m,d]=s.split('-');return `${+m}/${+d}`}
+function fn(n){if(n===''||n==null)return '';const v=Number(n);return isNaN(v)?'':v.toLocaleString('ja-JP')}
+
+/* 6ヶ月後の日付文字列 */
+function addM6(dstr){const d=new Date(dstr);d.setMonth(d.getMonth()+6);return ds(d)}
+/* 期限切れ判定 — YYYY-MM-DD文字列は辞書順で日付比較可能なのでDate生成不要 */
+function isExp(entryDstr,checkDstr){return checkDstr>=addM6(entryDstr)}
+
+let C={};
+
+function buildCache(){
+  C.days=wds(S.year,S.month);
+  C.lastD=S.revealed>0?ds(C.days[S.revealed-1]):null;
+  C.sh=Math.max(Number(S.shares)||1,1);
+  C.curP=C.lastD?(S.prices[C.lastD]||null):null;
+  C.revDstrs=new Set(C.days.slice(0,S.revealed).map(d=>ds(d)));
+  C.entryMap=new Map();
+  for(const g of S.groups){
+    for(const e of g.buys)C.entryMap.set(e.id,e);
+    for(const e of g.sells)C.entryMap.set(e.id,e);
+  }
+  C.open=[];
+  S.groups.forEach((g,gi)=>{
+    for(const e of g.buys)if(!e.settled)C.open.push({...e,gi});
+    for(const e of g.sells)if(!e.settled)C.open.push({...e,gi});
+  });
+  C.autoStlIds=new Set();
+  C.settleExitMap=new Map();
+  C.settleGiMap=new Map();
+  for(const ss of Object.values(S.settles)){
+    for(const s of ss){
+      if(s.auto)C.autoStlIds.add(s.posId);
+      if(!C.settleExitMap.has(s.posId))C.settleExitMap.set(s.posId,s.exitPrice);
+      if(!C.settleGiMap.has(s.posId))C.settleGiMap.set(s.posId,s.settledGi!=null?s.settledGi:-1);
+    }
+  }
+  C.monthHi=null;C.monthLo=null;
+  C.revDstrs.forEach(function(d){
+    var hi=S.extOHLC[d]?S.extOHLC[d].h:(S.prices[d]||null);
+    var lo=S.extOHLC[d]?S.extOHLC[d].l:(S.prices[d]||null);
+    if(hi&&(C.monthHi===null||hi>C.monthHi))C.monthHi=hi;
+    if(lo&&(C.monthLo===null||lo<C.monthLo))C.monthLo=lo;
+  });
+}
+
+function entryById(id){
+  if(C.entryMap)return C.entryMap.get(id)||null;
+  for(const g of S.groups){
+    for(const e of g.buys)if(e.id===id)return e;
+    for(const e of g.sells)if(e.id===id)return e;
+  }
+  return null;
+}
+function openEgi(){return C.open||S.groups.flatMap((g,gi)=>[...g.buys,...g.sells].filter(e=>!e.settled).map(e=>({...e,gi})))}
+
+function calcGroupDisp(gi,type){
+  const own=type==='buy'?S.groups[gi].buys:S.groups[gi].sells;
+  const ownIds=new Set(own.map(e=>e.id));
+  const carried=(S.carries[gi]||[])
+    .map(id=>entryById(id))
+    .filter(e=>e&&!ownIds.has(e.id)&&e.type===type);
+  return [...carried,...own].sort((a,b)=>(b.price||0)-(a.price||0));
+}
+
+function dayProfit(dstr_){
+  const ss=S.settles[dstr_]||[];if(!ss.length)return null;
+  let t=0,any=false;
+  for(const s of ss){
+    const e=entryById(s.posId);if(!e||!e.price||!s.exitPrice)continue;
+    t+=(e.type==='buy'?s.exitPrice-e.price:e.price-s.exitPrice)*C.sh;any=true;
+  }
+  return any?t:null;
+}
+function monthProfit(){
+  const days=C.days||wds(S.year,S.month);
+  let t=0;
+  for(const d of days){const p=dayProfit(ds(d));if(p)t+=p;}
+  return t;
+}
+
+function hasAnyPrice(){for(const _ in S.prices)return true;return false;}
+
+function predictNextDay(){
+  if(!S.revealed||!C.days)return null;
+  var revDays=C.days.slice(0,S.revealed);
+  var series=[],dates=[];
+  for(var i=0;i<revDays.length;i++){var dstr=ds(revDays[i]);var p=S.prices[dstr];if(p){series.push(p);dates.push(dstr);}}
+  if(series.length<20){
+    var need=25,prevSeries=[],prevDates=[];
+    try{var py=S.month===1?S.year-1:S.year,pm=S.month===1?12:S.month-1;
+      var raw=localStorage.getItem('katotre_'+py+'_'+(pm<10?'0':'')+pm);
+      if(raw){var pmDays=wds(py,pm);for(var k=pmDays.length-1;k>=0&&prevSeries.length<need;k--){var pdstr=ds(pmDays[k]);var pp=S.prices[pdstr];if(pp){prevSeries.unshift(pp);prevDates.unshift(pdstr);}}}
+    }catch(e){}
+    series=prevSeries.concat(series);dates=prevDates.concat(dates);
+  }
+  if(series.length<6)return null;
+  var n=series.length;
+
+  function ma(arr,i,len){if(i<len-1)return null;var s=0;for(var k=i-len+1;k<=i;k++)s+=arr[k];return s/len;}
+  function ma5(arr,i){return ma(arr,i,5);}
+  var hasDow=Object.keys(S.extDow).length>0,dowKeys=hasDow?Object.keys(S.extDow).sort():[];
+  function latestDow(d){if(!hasDow)return null;var f=null;for(var k=0;k<dowKeys.length;k++){if(dowKeys[k]<d)f=dowKeys[k];else break;}return f?S.extDow[f]:null;}
+  function prevDow(d){if(!hasDow)return null;var c=0;for(var k=dowKeys.length-1;k>=0;k--){if(dowKeys[k]<d){c++;if(c===2)return S.extDow[dowKeys[k]];}}return null;}
+  function dowDir(idx){if(!hasDow||idx<1)return null;var ref;if(idx<n-1&&dates[idx+1])ref=dates[idx+1];else{var t=new Date(dates[idx]);t.setDate(t.getDate()+3);ref=ds(t);}var d0=latestDow(ref),d1=prevDow(ref);if(!d0||!d1)return null;return d0>=d1?1:0;}
+  var hasVol=Object.keys(S.extVol).length>0;
+  function volRank(idx){if(!hasVol)return null;var vs=[];for(var k=Math.max(0,idx-19);k<idx;k++){var v=S.extVol[dates[k]];if(v)vs.push(v);}if(vs.length<5)return null;var avg=vs.reduce(function(s,v){return s+v;},0)/vs.length,cur=S.extVol[dates[idx]];if(!cur)return null;return cur/avg>=1.5?1:cur/avg<=0.7?-1:0;}
+  function volDir(idx){if(!hasVol||idx<1)return null;var vr=volRank(idx);if(vr!==1)return null;return series[idx]>series[idx-1]?'up':series[idx]<series[idx-1]?'down':null;}
+  function atr14(idx){if(idx<14)return null;var sum=0;for(var k=idx-13;k<=idx;k++){var prev=series[k-1];var ohlc=S.extOHLC&&S.extOHLC[dates[k]];var tr=ohlc?Math.max(ohlc.h-ohlc.l,Math.abs(ohlc.h-prev),Math.abs(ohlc.l-prev)):Math.abs(series[k]-prev);sum+=tr;}return sum/14;}
+  var atrNow=atr14(n-1);
+  var atrPct=null;
+  if(atrNow!==null&&n>=20){var atrHist=[];for(var ai=14;ai<n-1;ai++){var av=atr14(ai);if(av!==null)atrHist.push(av);}if(atrHist.length>=5)atrPct=Math.round(atrHist.filter(function(a){return a<=atrNow;}).length/atrHist.length*100);}
+  var isTrend=atrPct!==null&&atrPct>=80;
+  var isQuiet=atrPct!==null&&atrPct<=20;
+  function rsi14(idx){
+    if(idx<14)return null;
+    var avgG=0,avgL=0;
+    for(var k=1;k<=14;k++){var d=series[k]-series[k-1];if(d>0)avgG+=d;else avgL+=(-d);}
+    avgG/=14;avgL/=14;
+    for(var k=15;k<=idx;k++){
+      var d=series[k]-series[k-1];
+      avgG=(avgG*13+(d>0?d:0))/14;
+      avgL=(avgL*13+(d<0?(-d):0))/14;
+    }
+    if(avgG===0&&avgL===0)return 50;
+    if(avgL===0)return 100;
+    return 100-(100/(1+avgG/avgL));
+  }
+  function bb20(idx){if(idx<19)return null;var vals=[];for(var k=idx-19;k<=idx;k++)vals.push(series[k]);var avg=vals.reduce(function(s,v){return s+v;},0)/20,variance=vals.reduce(function(s,v){return s+(v-avg)*(v-avg);},0)/20,sd=Math.sqrt(variance);if(sd===0)return{pos:50,upper:avg,lower:avg,mid:avg};var pos=Math.min(100,Math.max(0,Math.round((series[idx]-(avg-2*sd))/(4*sd)*100)));return{pos,upper:avg+2*sd,lower:avg-2*sd,mid:avg};}
+  function emaVal(endIdx,period){
+    if(endIdx<period-1)return null;
+    var v=0;for(var k=0;k<period;k++)v+=series[k];v/=period;
+    var a=2/(period+1);
+    for(var k=period;k<=endIdx;k++)v=series[k]*a+v*(1-a);
+    return v;
+  }
+  function macdLine(idx){
+    var e12=emaVal(idx,12),e26=emaVal(idx,26);
+    if(e12===null||e26===null)return null;
+    return e12-e26;
+  }
+  function macdSignal(idx){
+    if(idx<34)return null;
+    var start=Math.max(25,idx-60);
+    var macdArr=[];
+    for(var k=start;k<=idx;k++){var ml=macdLine(k);if(ml!==null)macdArr.push(ml);}
+    if(macdArr.length<9)return null;
+    var sig=0;for(var k=0;k<9;k++)sig+=macdArr[k];sig/=9;
+    var a=2/10;
+    for(var k=9;k<macdArr.length;k++)sig=macdArr[k]*a+sig*(1-a);
+    return sig;
+  }
+  function stoch(idx){if(idx<13)return null;var hs=[],ls=[];for(var k=idx-13;k<=idx;k++){hs.push(series[k]);ls.push(series[k]);}var H=Math.max.apply(null,hs),L=Math.min.apply(null,ls);if(H===L)return 50;return Math.round((series[idx]-L)/(H-L)*100);}
+  function chopScore(idx,w){
+    if(idx<w)return 0;
+    var atrSum=0;
+    for(var k=idx-w+1;k<=idx;k++){
+      if(k<1)continue;
+      var ohlck=S.extOHLC&&S.extOHLC[dates[k]];
+      var prev=series[k-1];
+      var tr=ohlck?Math.max(ohlck.h-ohlck.l,Math.abs(ohlck.h-prev),Math.abs(ohlck.l-prev)):Math.abs(series[k]-prev);
+      atrSum+=tr;
+    }
+    var hi=-Infinity,lo=Infinity;
+    for(var k=Math.max(0,idx-w+1);k<=idx;k++){if(series[k]>hi)hi=series[k];if(series[k]<lo)lo=series[k];}
+    var priceRange=hi-lo;
+    if(priceRange<1)return 0.5;
+    return Math.min(1,Math.max(0,(atrSum/priceRange-1)/(w-1)));
+  }
+  var chop5=n>5?chopScore(n-1,5):0,chop10=n>10?chopScore(n-1,10):0;
+  var chopLevel=Math.round((chop5*0.5+chop10*0.5)*100),isRange=chopLevel>=65;
+
+  function ma25v(i){var ext=S.extMA&&S.extMA[dates[i]];return (ext&&ext.ma25)?ext.ma25:ma(series,i,25);}
+  function ma75v(i){var ext=S.extMA&&S.extMA[dates[i]];return (ext&&ext.ma75)?ext.ma75:ma(series,i,75);}
+  function ma5extv(i){var ext=S.extMA&&S.extMA[dates[i]];return (ext&&ext.ma5)?ext.ma5:ma5(series,i);}
+  var ma25Now=ma25v(n-1), ma25Prv=n>=2?ma25v(n-2):null;
+  var ma75Now=ma75v(n-1), ma75Prv=n>=2?ma75v(n-2):null;
+  var ma5Now=ma5extv(n-1), ma5Prv=n>=2?ma5extv(n-2):null;
+  var maGC75=!!(ma25Now&&ma25Prv&&ma75Now&&ma75Prv&&ma25Prv<=ma75Prv&&ma25Now>ma75Now);
+  var maDC75=!!(ma25Now&&ma25Prv&&ma75Now&&ma75Prv&&ma25Prv>=ma75Prv&&ma25Now<ma75Now);
+  var maGC25=!!(ma5Now&&ma5Prv&&ma25Now&&ma25Prv&&ma5Prv<=ma25Prv&&ma5Now>ma25Now);
+  var maDC25=!!(ma5Now&&ma5Prv&&ma25Now&&ma25Prv&&ma5Prv>=ma25Prv&&ma5Now<ma25Now);
+  var ma25AboveMa75=(ma25Now&&ma75Now)?ma25Now>ma75Now:null;
+  var ma25Rising=(ma25Now&&ma25Prv)?ma25Now>ma25Prv:null;
+  var ma75Rising=(ma75Now&&ma75Prv)?ma75Now>ma75Prv:null;
+  var maCrossType=maGC75?'GC75':maDC75?'DC75':maGC25?'GC25':maDC25?'DC25':null;
+
+  var score=0;var scoreItems=[];
+  var rsiVal=rsi14(n-1);
+  if(rsiVal!==null){
+    if(rsiVal<=30){score+=2;scoreItems.push({name:'RSI売られすぎ',val:+2});}
+    else if(rsiVal<=40){score+=1;scoreItems.push({name:'RSI低め',val:+1});}
+    else if(rsiVal>=70){score-=2;scoreItems.push({name:'RSI買われすぎ',val:-2});}
+    else if(rsiVal>=60){score-=1;scoreItems.push({name:'RSI高め',val:-1});}
+  }
+  var bbVal=bb20(n-1);
+  if(bbVal){
+    if(bbVal.pos<=10){score+=2;scoreItems.push({name:'BB下限',val:+2});}
+    else if(bbVal.pos<=30){score+=1;scoreItems.push({name:'BBやや下',val:+1});}
+    else if(bbVal.pos>=90){score-=2;scoreItems.push({name:'BB上限',val:-2});}
+    else if(bbVal.pos>=70){score-=1;scoreItems.push({name:'BBやや上',val:-1});}
+  }
+  var m5v=ma5(series,n-1);
+  if(m5v){if(series[n-1]>m5v){score+=1;scoreItems.push({name:'MA5上',val:+1});}else{score-=1;scoreItems.push({name:'MA5下',val:-1});}}
+  var ml=macdLine(n-1),ms=macdSignal(n-1);
+  if(ml!==null&&ms!==null){if(ml>ms){score+=1;scoreItems.push({name:'MACD上',val:+1});}else{score-=1;scoreItems.push({name:'MACD下',val:-1});}}
+  var stv=stoch(n-1);
+  if(stv!==null){if(stv<=20){score+=1;scoreItems.push({name:'Stoch低',val:+1});}else if(stv>=80){score-=1;scoreItems.push({name:'Stoch高',val:-1});}}
+  var dd=dowDir(n-1);
+  if(dd!==null){if(dd===1){score+=1;scoreItems.push({name:'NY上昇',val:+1});}else{score-=1;scoreItems.push({name:'NY下落',val:-1});}}
+  var vr=volRank(n-1);
+  if(vr!==null&&vr!==0){if(vr===1){score+=1;scoreItems.push({name:'出来高大',val:+1});}else{score-=1;scoreItems.push({name:'出来高小',val:-1});}}
+  var vd=volDir(n-1);
+  if(vd==='down'){score-=2;scoreItems.push({name:'大量+下降',val:-2});}
+  if(isTrend&&n>=2){var prDir=series[n-1]>series[n-2]?1:-1;if(prDir>0){score+=1;scoreItems.push({name:'ATR高↑',val:+1});}else{score-=1;scoreItems.push({name:'ATR高↓',val:-1});}}
+  else if(isQuiet){scoreItems.push({name:'ATR低/静',val:0});}
+  if(maGC75){score+=5;scoreItems.push({name:'GC(25×75)',val:+5});}
+  else if(maDC75){score-=5;scoreItems.push({name:'DC(25×75)',val:-5});}
+  else if(maGC25){score+=3;scoreItems.push({name:'GC(5×25)',val:+3});}
+  else if(maDC25){score-=3;scoreItems.push({name:'DC(5×25)',val:-3});}
+  else if(ma25AboveMa75!==null){
+    if(ma25AboveMa75&&ma25Rising===true){score+=3;scoreItems.push({name:'MA25>75↑',val:+3});}
+    else if(!ma25AboveMa75&&ma25Rising===false){score-=3;scoreItems.push({name:'MA25<75↓',val:-3});}
+    else if(ma25AboveMa75){score+=1;scoreItems.push({name:'MA25>75',val:+1});}
+    else{score-=1;scoreItems.push({name:'MA25<75',val:-1});}
+  }
+
+  var accumSignal=0;
+  if(n>=6&&hasVol){
+    var volArr5=[],closeArr5=[];
+    for(var k=n-5;k<=n-1;k++){
+      var vk=S.extVol&&S.extVol[dates[k]]?S.extVol[dates[k]]:null;
+      if(vk)volArr5.push(vk);
+      closeArr5.push(series[k]);
+    }
+    if(volArr5.length>=4){
+      var volEarly=volArr5.slice(0,2).reduce(function(a,b){return a+b;},0)/2;
+      var volLate=volArr5.slice(-2).reduce(function(a,b){return a+b;},0)/2;
+      var volIncreasing=volLate/volEarly>=1.2;
+      var rangeMax=Math.max.apply(null,closeArr5),rangeMin=Math.min.apply(null,closeArr5);
+      var atr14v=atr14(n-1);
+      var smallRange=atr14v>0&&(rangeMax-rangeMin)<=atr14v*1.5;
+      var gentleUp=closeArr5[closeArr5.length-1]>=closeArr5[0];
+      if(volIncreasing&&smallRange&&gentleUp){
+        accumSignal=3;
+        scoreItems.push({name:'🏦仕込みフェーズ',val:'votes+2'});
+      } else if(volIncreasing&&smallRange&&!gentleUp){
+        accumSignal=-3;
+        scoreItems.push({name:'🏦分配フェーズ',val:'votes-2'});
+      }
+    }
+  }
+
+  var distributionSignal=0;
+  if(hasVol&&n>=2){
+    var todayVol=S.extVol&&S.extVol[dates[n-1]]?S.extVol[dates[n-1]]:null;
+    var avgVolCalc=0,vc=0;
+    for(var k=Math.max(0,n-21);k<n-1;k++){
+      var vvk=S.extVol&&S.extVol[dates[k]]?S.extVol[dates[k]]:null;
+      if(vvk){avgVolCalc+=vvk;vc++;}
+    }
+    if(vc>0)avgVolCalc/=vc;
+    var todayChgPct=n>=2?(series[n-1]-series[n-2])/series[n-2]*100:0;
+    if(todayVol&&avgVolCalc>0&&todayVol/avgVolCalc>=2.0&&todayChgPct>=2.0){
+      distributionSignal=-4;
+      scoreItems.push({name:'🚨売り抜け検出',val:'votes-3'});
+    } else if(todayVol&&avgVolCalc>0&&todayVol/avgVolCalc>=2.0&&todayChgPct<=-2.0){
+      distributionSignal=2;
+      scoreItems.push({name:'💥パニック売り反発',val:'votes+2'});
+    }
+  }
+
+  var vbpSignal=0;
+  if(hasVol&&n>=10){
+    var lookback=Math.min(30,n-1);
+    var priceMin=Infinity,priceMax=-Infinity;
+    for(var k=n-lookback;k<n;k++){
+      if(series[k]<priceMin)priceMin=series[k];
+      if(series[k]>priceMax)priceMax=series[k];
+    }
+    var pRange=priceMax-priceMin;
+    if(pRange>10){
+      var bins=10;
+      var binVol=[];for(var b=0;b<bins;b++)binVol.push(0);
+      for(var k=n-lookback;k<n-1;k++){
+        var vk2=S.extVol&&S.extVol[dates[k]]?S.extVol[dates[k]]:0;
+        var binIdx=Math.min(bins-1,Math.floor((series[k]-priceMin)/pRange*bins));
+        binVol[binIdx]+=vk2;
+      }
+      var maxBinIdx=0;
+      for(var b=0;b<bins;b++)if(binVol[b]>binVol[maxBinIdx])maxBinIdx=b;
+      var vbpCenterPrice=priceMin+(maxBinIdx+0.5)/bins*pRange;
+      var currentPrice=series[n-1];
+      var distPct=(currentPrice-vbpCenterPrice)/vbpCenterPrice*100;
+      var binWidth=pRange/bins;
+      var nearVBP=Math.abs(currentPrice-vbpCenterPrice)<=binWidth*1.5;
+      if(nearVBP&&distPct>0&&distPct<=3){
+        vbpSignal=2;
+        scoreItems.push({name:'📊VBPサポート',val:'votes+1'});
+      } else if(nearVBP&&distPct<0&&distPct>=-3){
+        vbpSignal=-2;
+        scoreItems.push({name:'📊VBPレジスタンス',val:'votes-1'});
+      } else if(distPct>=5){
+        vbpSignal=-1;
+        scoreItems.push({name:'📊VBP上離れ',val:'votes-1'});
+      } else if(distPct<=-5){
+        vbpSignal=1;
+        scoreItems.push({name:'📊VBP下離れ',val:'votes+1'});
+      }
+    }
+  }
+  var scoreAdj=score;
+  var scoreDir=scoreAdj>=0?'up':'down';
+
+  var bayesLogOdds=0;var bayesCount=0;
+  var totalUp=0,totalDn=0;
+  for(var j=5;j<n-1;j++){if(series[j+1]>=series[j])totalUp++;else totalDn++;}
+  var totalHist=totalUp+totalDn;
+  if(totalHist>=10){
+    var priorOdds=totalUp/Math.max(1,totalDn);
+    bayesLogOdds=Math.log(priorOdds);
+    function bayesFactor(filterFn){var fu=0,fd2=0;for(var j=5;j<n-1;j++){if(!filterFn(j))continue;if(series[j+1]>=series[j])fu++;else fd2++;}var t=fu+fd2;if(t<3)return 0;return Math.log((fu+0.5)/(fd2+0.5))-(Math.log((totalUp+0.5)/(totalDn+0.5)));}
+    if(rsiVal!==null)bayesLogOdds+=bayesFactor(function(j){var r=rsi14(j);return r!==null&&Math.abs(r-rsiVal)<15;});
+    if(bbVal)bayesLogOdds+=bayesFactor(function(j){var b=bb20(j);return b&&Math.abs(b.pos-bbVal.pos)<20;});
+    if(dd!==null)bayesLogOdds+=bayesFactor(function(j){return dowDir(j)===dd;});
+    bayesCount=totalHist;
+  }
+  var bayesProb=totalHist>=10?Math.round(100/(1+Math.exp(-bayesLogOdds))):50;
+  var bayesDir=bayesProb>=50?'up':'down';
+
+  var sakata=null;
+  function getOHLC(idx){
+    var d=dates[idx];
+    if(S.extOHLC&&S.extOHLC[d])return S.extOHLC[d];
+    var c=series[idx],prev=idx>0?series[idx-1]:c;
+    return{o:prev,h:Math.max(prev,c),l:Math.min(prev,c),c:c};
+  }
+  if(n>=3){
+    var c0=getOHLC(n-1),c1=getOHLC(n-2),c2=getOHLC(n-3);
+    var isBull0=c0.c>=c0.o,isBull1=c1.c>=c1.o,isBull2=c2.c>=c2.o;
+    var body0=Math.abs(c0.c-c0.o),body1=Math.abs(c1.c-c1.o),body2=Math.abs(c2.c-c2.o);
+    var range0=c0.h-c0.l;
+    if(isBull0&&isBull1&&isBull2&&c0.c>c1.c&&c1.c>c2.c&&body0>0&&body1>0&&body2>0)
+      sakata={name:'三本陽線',dir:'up',score:2,emoji:'📈'};
+    else if(!isBull0&&!isBull1&&!isBull2&&c0.c<c1.c&&c1.c<c2.c&&body0>0&&body1>0&&body2>0)
+      sakata={name:'三本陰線',dir:'down',score:-2,emoji:'📉'};
+    else if(isBull0&&!isBull1&&c0.o<=c1.c&&c0.c>=c1.o&&body0>body1)
+      sakata={name:'陽の包み足',dir:'up',score:2,emoji:'🔼'};
+    else if(!isBull0&&isBull1&&c0.o>=c1.c&&c0.c<=c1.o&&body0>body1)
+      sakata={name:'陰の包み足',dir:'down',score:-2,emoji:'🔽'};
+    else if(body1>body0*2&&c0.h<=c1.h&&c0.l>=c1.l&&isBull1)
+      sakata={name:'陽のはらみ',dir:'up',score:1,emoji:'⚡'};
+    else if(body1>body0*2&&c0.h<=c1.h&&c0.l>=c1.l&&!isBull1)
+      sakata={name:'陰のはらみ',dir:'down',score:-1,emoji:'⚡'};
+    else if(n>=3&&isBull0&&!isBull2&&body2>0&&body0>body1&&c0.c>c2.c)
+      sakata={name:'明けの明星',dir:'up',score:3,emoji:'🌟'};
+    else if(n>=3&&!isBull0&&isBull2&&body2>0&&body0>body1&&c0.c<c2.c)
+      sakata={name:'宵の明星',dir:'down',score:-3,emoji:'🌙'};
+    else if(isBull0&&!isBull1&&isBull2&&c0.o>c1.c&&c2.o<c1.o)
+      sakata={name:'上昇たすき',dir:'up',score:1,emoji:'↗'};
+    else if(range0>0&&(c0.h-Math.max(c0.o,c0.c))>=body0*2&&body0/range0<0.3)
+      sakata={name:'上影線',dir:'down',score:-1,emoji:'⬇'};
+    else if(range0>0&&(Math.min(c0.o,c0.c)-c0.l)>=body0*2&&body0/range0<0.3)
+      sakata={name:'下影線',dir:'up',score:1,emoji:'⬆'};
+    else if(body0/Math.max(range0,0.001)<0.05)
+      sakata={name:'十字線',dir:null,score:0,emoji:'✚'};
+  }
+  var sakataDir=sakata&&sakata.dir?sakata.dir:null;
+
+  var votes={up:0,down:0};
+  var scorePower=Math.min(3,Math.ceil(Math.abs(scoreAdj)/2));
+  if(scoreDir==='up')votes.up+=scorePower;else votes.down+=scorePower;
+  var bayesPower=Math.abs(bayesProb-50)>=20?2:1;
+  if(bayesDir==='up')votes.up+=bayesPower;else votes.down+=bayesPower;
+  if(sakata&&sakata.dir){var sakPower=Math.min(2,Math.abs(sakata.score));if(sakata.dir==='up')votes.up+=sakPower;else votes.down+=sakPower;}
+  if(!maCrossType&&ma25AboveMa75!==null){if(ma25AboveMa75&&ma25Rising===true)votes.up+=1;else if(!ma25AboveMa75&&ma25Rising===false)votes.down+=1;}
+  if(vd==='up') votes.down+=2;
+  else if(vd==='down') votes.up+=2;
+  if(isTrend&&n>=2){if(series[n-1]>series[n-2])votes.up+=1;else votes.down+=1;}
+
+  if(accumSignal>0){votes.up+=2;}
+  else if(accumSignal<0){votes.down+=2;}
+  if(distributionSignal<0){votes.down+=3;}
+  else if(distributionSignal>0){votes.up+=2;}
+  if(vbpSignal>0){votes.up+=1;}
+  else if(vbpSignal<0){votes.down+=1;}
+
+  var patternLog=[];
+  if(S.patternAnalysis&&S.patternAnalysis.n>=20){
+    var pa=S.patternAnalysis;
+    var todayChgPa=n>=2?(series[n-1]-series[n-2])/series[n-2]*100:0;
+    var todayVolPa=hasVol?S.extVol[dates[n-1]]:null;
+    var ohlcNow=S.extOHLC&&S.extOHLC[dates[n-1]]?S.extOHLC[dates[n-1]]:null;
+    var todayO=ohlcNow?ohlcNow.o:series[n-1];
+    var todayH=ohlcNow?ohlcNow.h:series[n-1];
+    var todayL=ohlcNow?ohlcNow.l:series[n-1];
+    var todayRange=todayH-todayL;
+    var todayBody=Math.abs(series[n-1]-todayO);
+    var todayUW=todayH-Math.max(todayO,series[n-1]);
+    var gapPct=n>=2?(todayO-series[n-2])/series[n-2]*100:0;
+    var isCont3Up=n>=4&&series[n-1]>series[n-2]&&series[n-2]>series[n-3]&&series[n-3]>series[n-4];
+    var isCont3Dn=n>=4&&series[n-1]<series[n-2]&&series[n-2]<series[n-3]&&series[n-3]<series[n-4];
+    var isWknd=false;
+    if(n>=2&&dates[n-1]&&dates[n-2]){var _d0=new Date(dates[n-2]),_d1=new Date(dates[n-1]);isWknd=(_d1-_d0)/864e5>=3;}
+
+    function pctToVotes(pct,name){
+      if(pct===null)return;
+      var upPct=pct,dnPct=100-pct;
+      var dir,pw;
+      if(upPct>=70){dir='up';pw=3;}
+      else if(upPct>=62){dir='up';pw=2;}
+      else if(upPct>=55){dir='up';pw=1;}
+      else if(dnPct>=70){dir='down';pw=3;}
+      else if(dnPct>=62){dir='down';pw=2;}
+      else if(dnPct>=55){dir='down';pw=1;}
+      else return;
+      if(dir==='up'){votes.up+=pw;}else{votes.down+=pw;}
+      patternLog.push({name:name,pct:upPct,dir:dir,pw:pw});
+    }
+
+    pa.items.forEach(function(item){
+      var matched=false;
+      var nm=item.name;
+      if(nm==='異常出来高＋当日上昇')matched=pa.hasVol&&pa.avgVol>0&&todayVolPa&&todayVolPa/pa.avgVol>=2.0&&todayChgPa>=0;
+      else if(nm==='異常出来高＋当日下落')matched=pa.hasVol&&pa.avgVol>0&&todayVolPa&&todayVolPa/pa.avgVol>=2.0&&todayChgPa<0;
+      else if(nm==='大陽線（＋2%超）')matched=todayChgPa>=2.0;
+      else if(nm==='大陰線（－2%超）')matched=todayChgPa<=-2.0;
+      else if(nm==='値幅大＋当日上昇')matched=pa.avgRange>0&&todayRange>=pa.avgRange*1.5&&todayChgPa>0;
+      else if(nm==='上窓あき（＋2%超）')matched=gapPct>=2.0;
+      else if(nm==='下窓あき（－2%超）')matched=gapPct<=-2.0;
+      else if(nm==='上ヒゲ大（実体比2倍）')matched=todayBody>5&&todayUW>=todayBody*2;
+      else if(nm==='連続3日上昇後')matched=isCont3Up;
+      else if(nm==='連続3日下落後')matched=isCont3Dn;
+      else if(nm==='週またぎ翌日')matched=isWknd;
+      if(matched)pctToVotes(item.pct,nm);
+    });
+  }
+
+  var totalVotes=votes.up+votes.down;
+  var finalDir=votes.up>=votes.down?'up':'down';
+  var winVotes=Math.max(votes.up,votes.down);
+  var stars=winVotes/totalVotes>=0.68?3:winVotes/totalVotes>=0.52?2:1;
+  if(totalHist<10&&stars===3)stars=2;
+
+  var patternBoost=false;
+  if(patternLog.length>0){
+    var sRank=patternLog.filter(function(p){return p.pw>=3;});
+    var aRank=patternLog.filter(function(p){return p.pw>=2;});
+    if(sRank.length>=2){stars=3;patternBoost=true;}
+    else if(sRank.length>=1){if(stars<2)stars=2;patternBoost=true;}
+    else if(aRank.length>=2){if(stars<2)stars=2;patternBoost=true;}
+    else if(aRank.length>=1){patternBoost=true;}
+  }
+
+  var ma5Now2=ma5extv(n-1),ma25Now2=ma25v(n-1),ma75Now2=ma75v(n-1);
+  var closeNow=series[n-1];
+  var maPosition=null;
+  if(ma5Now2&&ma25Now2&&ma75Now2&&closeNow){
+    var aboveAll=closeNow>ma5Now2&&ma5Now2>ma25Now2&&ma25Now2>ma75Now2;
+    var belowAll=closeNow<ma5Now2&&ma5Now2<ma25Now2&&ma25Now2<ma75Now2;
+    var aboveMa25=closeNow>ma25Now2;
+    var nearMa25=Math.abs(closeNow-ma25Now2)/ma25Now2*100<=1.5;
+    if(ma25Rising&&ma75Rising&&aboveAll) maPosition='perfect_up';
+    else if(!ma25Rising&&!ma75Rising&&belowAll) maPosition='perfect_down';
+    else if(nearMa25&&ma25Rising!==false) maPosition='near_ma25';
+    else if(aboveMa25) maPosition='above_ma25';
+    else maPosition='below_ma25';
+  }
+  var osimePullback=false;
+  if(ma25Rising===true&&ma25AboveMa75===true&&ma25Now2&&closeNow){
+    var devFromMa25=(closeNow-ma25Now2)/ma25Now2*100;
+    var recentDown=n>=3&&series[n-1]<series[n-2]&&series[n-2]<=series[n-3];
+    var closingInOnMa25=devFromMa25>=0&&devFromMa25<=3.0;
+    if(closingInOnMa25&&recentDown) osimePullback=true;
+  }
+  var modoriSell=false;
+  if(ma25Rising===false&&ma25AboveMa75===false&&ma25Now2&&closeNow){
+    var devFromMa25d=(ma25Now2-closeNow)/ma25Now2*100;
+    var recentUp=n>=3&&series[n-1]>series[n-2]&&series[n-2]>=series[n-3];
+    var closingInOnMa25d=devFromMa25d>=0&&devFromMa25d<=3.0;
+    if(closingInOnMa25d&&recentUp) modoriSell=true;
+  }
+  var ma25Dev=ma25Now2&&closeNow?Math.round((closeNow-ma25Now2)/ma25Now2*1000)/10:null;
+
+  return{
+    dir:finalDir,stars:stars,score:scoreAdj,bayesProb:bayesProb,sakata:sakata,
+    chop:chopLevel,isRange:isRange,votes:votes,rsi:rsiVal?Math.round(rsiVal):null,
+    bbPos:bbVal?bbVal.pos:null,maCross:maCrossType,ma25AboveMa75:ma25AboveMa75,
+    ma25Rising:ma25Rising,ma75Rising:ma75Rising,atrPct:atrPct,isTrend:isTrend,isQuiet:isQuiet,
+    volDir:vd,patternLog:patternLog,patternBoost:patternBoost,accumSignal:accumSignal,
+    distributionSignal:distributionSignal,vbpSignal:vbpSignal,votesUp:votes.up,votesDown:votes.down,
+    scoreItems:scoreItems,maPosition:maPosition,osimePullback:osimePullback,modoriSell:modoriSell,
+    ma25Dev:ma25Dev,ma5Now:ma5Now2,ma25Now:ma25Now2,ma75Now:ma75Now2
+  };
+}
+
+function classify5Level(pred){
+  if(!pred)return null;
+  var stars=pred.stars||1;
+  var dir=pred.dir;
+  var mc=pred.maCross;
+  var isRange=pred.isRange||(pred.chop!=null&&pred.chop>=65);
+  var patBoost=pred.patternBoost||false;
+  var STYLES={
+    5:{label:'買い優勢',emoji:'📈',cl:'var(--red)',fw:'900',sz:'12px'},
+    4:{label:'やや強気',emoji:'🔼',cl:'var(--red)',fw:'700',sz:'11px'},
+    3:{label:'中立',emoji:'⚡',cl:'var(--orange)',fw:'700',sz:'11px'},
+    2:{label:'やや弱気',emoji:'🔽',cl:'var(--blue)',fw:'700',sz:'11px'},
+    1:{label:'売り優勢',emoji:'📉',cl:'var(--blue)',fw:'900',sz:'12px'}
+  };
+  var lv;
+  if(mc==='GC75'){lv=5;}
+  else if(mc==='DC75'){lv=1;}
+  else if(stars===3){lv=dir==='up'?5:1;}
+  else if(mc==='GC25'){lv=stars>=2?5:4;}
+  else if(mc==='DC25'){lv=stars>=2?1:2;}
+  else if(stars===2){lv=dir==='up'?4:2;}
+  else if(stars===1&&patBoost){lv=dir==='up'?4:2;}
+  else{lv=3;}
+  return Object.assign({level:lv},STYLES[lv]);
+}
+
+function checkAutoSettle(revDstr){
+  const ep=S.prices[revDstr];
+  S.groups.forEach((g,gIdx)=>{
+    for(const arr of[g.buys,g.sells]){
+      for(const e of arr){
+        if(e.settled||!isExp(e.date,revDstr))continue;
+        if(!S.settles[revDstr])S.settles[revDstr]=[];
+        if(S.settles[revDstr].some(x=>x.posId===e.id))continue;
+        S.settles[revDstr].push({id:S.idc++,posId:e.id,exitPrice:ep,auto:true,settledGi:gIdx});
+        e.settled=true;
+      }
+    }
+  });
+}
+
+function warnPositions(){
+  if(!S.revealed||!C.days)return[];
+  const lastD=C.lastD||ds(C.days[S.revealed-1]);
+  const warnD=new Date(lastD);warnD.setDate(warnD.getDate()+30);
+  const warnStr=ds(warnD);
+  return C.open.filter(e=>addM6(e.date)<=warnStr);
+}
+
+function snapshotCarries(fromGi, toGi){
+  if(toGi>=12)return;
+  const ownIds=[...S.groups[fromGi].buys,...S.groups[fromGi].sells].map(e=>e.id);
+  const carriedIds=S.carries[fromGi]||[];
+  const allIds=[...new Set([...carriedIds,...ownIds])];
+  const unsettled=allIds.filter(id=>{const e=entryById(id);return e&&!e.settled;});
+  const existing=new Set(S.carries[toGi]);
+  for(const id of unsettled)existing.add(id);
+  S.carries[toGi]=[...existing];
+}
+
+function toggleOrder(dstr,type){
+  if(!S.orders[dstr])S.orders[dstr]={buyId:null,sellId:null};
+  const ord=S.orders[dstr];
+  const key=type==='buy'?'buyId':'sellId';
+  if(ord[key]!==null){
+    rmFromGroups(ord[key]);ord[key]=null;
+  } else {
+    const price=S.prices[dstr]||null;
+    const id=S.idc++;
+    ord[key]=id;
+    const g=S.groups[S.gi];
+    const e={id,date:dstr,price,type,settled:false};
+    if(type==='buy'){g.buys.push(e);g.buys.sort((a,b)=>(b.price||0)-(a.price||0));}
+    else {g.sells.push(e);g.sells.sort((a,b)=>(b.price||0)-(a.price||0));}
+  }
+  R();
+}
+
+function rmFromGroups(id){
+  S.groups.forEach(g=>{g.buys=g.buys.filter(e=>e.id!==id);g.sells=g.sells.filter(e=>e.id!==id)});
+}
+
+function openSF(dstr){S.sfDs=dstr;S.selPosArr=[];S.exitInp=String(S.prices[dstr]||'');R()}
+function closeSF(){S.sfDs=null;S.selPosArr=[];S.exitInp='';R()}
+function togglePosF(id){
+  var idx=S.selPosArr.indexOf(id);
+  if(idx>=0){S.selPosArr.splice(idx,1);}else{S.selPosArr.push(id);}
+  R();
+}
+
+function confirmSettle(){
+  var dstr=S.sfDs;
+  if(!S.selPosArr||!S.selPosArr.length){alert('ポジションを選択してください');return}
+  var ep=parseFloat(S.exitInp);
+  if(!ep||isNaN(ep)){alert('決済価格を入力してください');return}
+  if(!S.settles[dstr])S.settles[dstr]=[];
+  S.selPosArr.forEach(function(posId){
+    S.settles[dstr].push({id:S.idc++,posId:posId,exitPrice:ep,auto:false,settledGi:S.gi});
+    var e=entryById(posId);if(e)e.settled=true;
+  });
+  S.sfDs=null;S.selPosArr=[];S.exitInp='';R();
+}
+
+function confirmAllSettle(){
+  var dstr=S.sfDs;
+  var ep=parseFloat(S.exitInp);
+  if(!ep||isNaN(ep)){alert('決済価格を入力してください');return}
+  var open=C.open;
+  if(!open||!open.length){alert('未決済ポジションがありません');return}
+  if(!confirm('全'+open.length+'件を決済価格'+ep+'円で決済しますか？'))return;
+  if(!S.settles[dstr])S.settles[dstr]=[];
+  open.forEach(function(e){
+    S.settles[dstr].push({id:S.idc++,posId:e.id,exitPrice:ep,auto:false,settledGi:S.gi});
+    var entry=entryById(e.id);if(entry)entry.settled=true;
+  });
+  S.sfDs=null;S.selPosArr=[];S.exitInp='';R();
+}
+
+function rmSettle(dstr,sid){
+  const ss=S.settles[dstr];if(!ss)return;
+  const s=ss.find(x=>x.id===sid);
+  if(s){const e=entryById(s.posId);if(e)e.settled=false;}
+  S.settles[dstr]=ss.filter(x=>x.id!==sid);R();
+}
+
+function reveal(){
+  const days=C.days||wds(S.year,S.month);
+  if(S.revealed<days.length){
+    if(C.lastD){
+      var pred=predictNextDay();
+      if(pred)S.predLog[C.lastD]={dir:pred.dir,chop:pred.chop,stars:pred.stars,score:pred.score,bayesProb:pred.bayesProb,sakata:pred.sakata?pred.sakata.name:null,maCross:pred.maCross,isRange:pred.isRange};
+    }
+    S.revealed++;
+    checkAutoSettle(ds(days[S.revealed-1]));
+    R();
+  }
+}
+function revealAll(){
+  const days=C.days||wds(S.year,S.month);
+  while(S.revealed<days.length){
+    if(C.lastD){var pred=predictNextDay();if(pred)S.predLog[C.lastD]={dir:pred.dir,chop:pred.chop,stars:pred.stars,score:pred.score,bayesProb:pred.bayesProb,sakata:pred.sakata?pred.sakata.name:null,maCross:pred.maCross,isRange:pred.isRange};}
+    S.revealed++;
+    checkAutoSettle(ds(days[S.revealed-1]));
+    buildCache();
+  }
+  R();
+}
+function advGrp(){if(S.gi<11){snapshotCarries(S.gi,S.gi+1);S.gi++;R()}}
+function prevGrp(){if(S.gi>0){S.gi--;R()}}
+function resetMonthData(){
+  S.revealed=0;S.orders={};S.settles={};S.groups=mkGroups();
+  S.carries=Array.from({length:12},()=>[]);
+  S.groupMemos=Array.from({length:12},()=>'');
+  S.gi=0;S.idc=1;
+}
+function resetMonth(){resetMonthData();R();}
+
+function parseDateStr(raw){
+  if(!raw)return null;
+  raw=String(raw).trim();
+  if(/^\d{8}$/.test(raw))return raw.slice(0,4)+'-'+raw.slice(4,6)+'-'+raw.slice(6,8);
+  var m=raw.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
+  if(m)return m[1]+'-'+(m[2].length<2?'0':'')+m[2]+'-'+(m[3].length<2?'0':'')+m[3];
+  return null;
+}
+
+function analyzeStockPatterns(){
+  var allDates = Object.keys(S.extOHLC).sort();
+  if(allDates.length < 20) return null;
+
+  var rows = allDates.map(function(d){
+    var o = S.extOHLC[d];
+    var vol = S.extVol[d] || null;
+    return {date:d, o:o.o, h:o.h, l:o.l, c:o.c, vol:vol};
+  }).filter(function(r){ return r.c > 0; });
+
+  var n = rows.length;
+  if(n < 20) return null;
+
+  var closes = rows.map(function(r){ return r.c; });
+  var vols   = rows.map(function(r){ return r.vol; }).filter(function(v){ return v !== null; });
+  var avgVol = vols.length > 0 ? vols.reduce(function(a,b){return a+b;},0)/vols.length : 0;
+  var avgRange = rows.map(function(r){ return r.h-r.l; }).reduce(function(a,b){return a+b;},0)/n;
+
+  function mk(){ return {u:0,d:0}; }
+  var P = {
+    volUp:mk(),volDn:mk(),bigUp:mk(),bigDn:mk(),wideUp:mk(),
+    gapUp:mk(),gapDn:mk(),cont3U:mk(),cont3D:mk(),weekend:mk(),upperWick:mk(),
+  };
+
+  for(var i=1; i<n-1; i++){
+    var c  = closes[i];
+    var cp = closes[i-1];
+    var cn = closes[i+1];
+    var chg = (c - cp)/cp * 100;
+    var nextUp = cn > c;
+    var vol = rows[i].vol;
+    var range = rows[i].h - rows[i].l;
+    var gap = (rows[i].o - cp)/cp * 100;
+    var body = Math.abs(c - rows[i].o);
+    var upperWick = rows[i].h - Math.max(rows[i].o, c);
+
+    if(avgVol>0 && vol && vol/avgVol>=2.0 && chg>=0){if(nextUp) P.volUp.u++; else P.volUp.d++;}
+    if(avgVol>0 && vol && vol/avgVol>=2.0 && chg<0){if(nextUp) P.volDn.u++; else P.volDn.d++;}
+    if(chg >= 2.0){ if(nextUp) P.bigUp.u++; else P.bigUp.d++; }
+    if(chg <= -2.0){ if(nextUp) P.bigDn.u++; else P.bigDn.d++; }
+    if(range >= avgRange*1.5 && chg > 0){ if(nextUp) P.wideUp.u++; else P.wideUp.d++; }
+    if(gap >= 2.0){ if(nextUp) P.gapUp.u++; else P.gapUp.d++; }
+    if(gap <= -2.0){ if(nextUp) P.gapDn.u++; else P.gapDn.d++; }
+    if(body > 5 && upperWick >= body*2){ if(nextUp) P.upperWick.u++; else P.upperWick.d++; }
+    if(i>=3 && closes[i]>closes[i-1]&&closes[i-1]>closes[i-2]&&closes[i-2]>closes[i-3]){if(nextUp) P.cont3U.u++; else P.cont3U.d++;}
+    if(i>=3 && closes[i]<closes[i-1]&&closes[i-1]<closes[i-2]&&closes[i-2]<closes[i-3]){if(nextUp) P.cont3D.u++; else P.cont3D.d++;}
+    if(i>0){var d0=new Date(rows[i-1].date), d1=new Date(rows[i].date);var diff=(d1-d0)/864e5;if(diff>=3){ if(cn>c) P.weekend.u++; else P.weekend.d++; }}
+  }
+
+  function pct(p){ var t=p.u+p.d; return t===0?null:Math.round(p.u/t*100); }
+
+  function judge(p, expectUp){
+    var t=p.u+p.d;
+    if(t<4) return {rank:'?', color:'var(--muted)', label:'サンプル少', n:t};
+    var pc = pct(p);
+    if(expectUp){
+      if(pc>=70) return {rank:'S', color:'#C62828', label:'強力↑'+pc+'%', n:t};
+      if(pc>=60) return {rank:'A', color:'#E65100', label:'有効↑'+pc+'%', n:t};
+      if(pc>=50) return {rank:'B', color:'var(--sub)', label:'やや↑'+pc+'%', n:t};
+      if(pc>=40) return {rank:'C', color:'var(--sub)', label:'やや↓'+(100-pc)+'%', n:t};
+      if(pc>=30) return {rank:'A', color:'#1565C0', label:'逆↓'+(100-pc)+'%', n:t};
+      return {rank:'S', color:'#1565C0', label:'強逆↓'+(100-pc)+'%', n:t};
+    } else {
+      var dp=100-pc;
+      if(dp>=70) return {rank:'S', color:'#1565C0', label:'強力↓'+dp+'%', n:t};
+      if(dp>=60) return {rank:'A', color:'#E65100', label:'有効↓'+dp+'%', n:t};
+      if(dp>=50) return {rank:'B', color:'var(--sub)', label:'やや↓'+dp+'%', n:t};
+      if(dp>=40) return {rank:'C', color:'var(--sub)', label:'やや↑'+(100-dp)+'%', n:t};
+      if(dp>=30) return {rank:'A', color:'#C62828', label:'逆↑'+(100-dp)+'%', n:t};
+      return {rank:'S', color:'#C62828', label:'強逆↑'+(100-dp)+'%', n:t};
+    }
+  }
+
+  return {
+    n: n, avgVol: Math.round(avgVol), avgRange: Math.round(avgRange), hasVol: avgVol > 0,
+    items: [
+      {name:'異常出来高＋当日上昇',icon:'🔥',desc:'出来高が平均2倍超かつ当日が上昇した翌日',expect:'down',pct:pct(P.volUp),j:judge(P.volUp,false),p:P.volUp,tip:'東ソーは86%下落。この銘柄は？'},
+      {name:'異常出来高＋当日下落',icon:'💧',desc:'出来高が平均2倍超かつ当日が下落した翌日',expect:'up',pct:pct(P.volDn),j:judge(P.volDn,true),p:P.volDn,tip:'大量売りの後に買い戻しが入るか？'},
+      {name:'大陽線（＋2%超）',icon:'🕯️',desc:'前日比＋2%超の大陽線翌日',expect:'down',pct:pct(P.bigUp),j:judge(P.bigUp,false),p:P.bigUp,tip:'急騰翌日は反落しやすいか？'},
+      {name:'大陰線（－2%超）',icon:'🕯️',desc:'前日比－2%超の大陰線翌日',expect:'up',pct:pct(P.bigDn),j:judge(P.bigDn,true),p:P.bigDn,tip:'急落翌日は反発しやすいか？'},
+      {name:'値幅大＋当日上昇',icon:'📏',desc:'当日値幅が平均1.5倍超かつ上昇した翌日',expect:'down',pct:pct(P.wideUp),j:judge(P.wideUp,false),p:P.wideUp,tip:'大きく動いた後の疲弊反転'},
+      {name:'上窓あき（＋2%超）',icon:'⬆',desc:'前日終値から2%超の窓あけスタート翌日',expect:'down',pct:pct(P.gapUp),j:judge(P.gapUp,false),p:P.gapUp,tip:'窓は埋まりやすいか？'},
+      {name:'下窓あき（－2%超）',icon:'⬇',desc:'前日終値から2%超の下窓あけスタート翌日',expect:'up',pct:pct(P.gapDn),j:judge(P.gapDn,true),p:P.gapDn,tip:'下窓は埋まりやすいか？'},
+      {name:'上ヒゲ大（実体比2倍）',icon:'📌',desc:'上ヒゲが実体の2倍超の日の翌日',expect:'down',pct:pct(P.upperWick),j:judge(P.upperWick,false),p:P.upperWick,tip:'上値抵抗の強さを示す'},
+      {name:'連続3日上昇後',icon:'📈',desc:'3日連続上昇した翌日',expect:'down',pct:pct(P.cont3U),j:judge(P.cont3U,false),p:P.cont3U,tip:'上昇継続か？それとも反落か？'},
+      {name:'連続3日下落後',icon:'📉',desc:'3日連続下落した翌日',expect:'up',pct:pct(P.cont3D),j:judge(P.cont3D,true),p:P.cont3D,tip:'下落継続か？それとも反発か？'},
+      {name:'週またぎ翌日',icon:'📅',desc:'土日をまたいだ月曜日の動き',expect:'up',pct:pct(P.weekend),j:judge(P.weekend,true),p:P.weekend,tip:'週末効果はあるか？'},
+    ]
+  };
+}
+
+function rPatternAnalysis(){
+  var pa = S.patternAnalysis;
+  if(!pa) return '';
+  var rankBg = {S:'#FFF3E0',A:'#F3F8FF',B:'var(--gray-lt)',C:'#FAFAFA','?':'#FAFAFA'};
+  var rows = pa.items.map(function(item){
+    if(item.pct === null) return '';
+    var j = item.j;
+    var total = item.p.u + item.p.d;
+    var upPct = item.pct;
+    var dnPct = 100 - upPct;
+    var barHtml =
+      '<div style="display:flex;height:8px;border-radius:4px;overflow:hidden;width:100%;margin-top:2px">' +
+      '<div style="background:var(--red-md);width:'+upPct+'%;transition:width .3s"></div>' +
+      '<div style="background:var(--blue-md);width:'+dnPct+'%;transition:width .3s"></div>' +
+      '</div>' +
+      '<div style="display:flex;justify-content:space-between;font-size:8px;color:var(--sub);margin-top:1px">' +
+      '<span style="color:var(--red)">↑'+upPct+'%</span><span style="color:var(--blue)">↓'+dnPct+'%</span>' +
+      '</div>';
+    return '<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-bottom:1px solid #F0F4F8;background:'+rankBg[j.rank]+'">' +
+      '<div style="min-width:22px;text-align:center;font-size:14px;line-height:1.2">'+item.icon+'</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">' +
+          '<span style="font-size:11px;font-weight:700">'+item.name+'</span>' +
+          '<span style="font-size:10px;font-weight:900;color:'+j.color+'">'+j.label+'</span>' +
+          '<span style="font-size:9px;color:var(--muted)">n='+total+'</span>' +
+        '</div>' +
+        '<div style="font-size:9px;color:var(--sub);margin-top:1px">'+item.desc+'</div>' +
+        barHtml +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  var volInfo = pa.hasVol
+    ? '平均出来高 '+pa.avgVol.toLocaleString()+' 株 ／ 平均値幅 '+pa.avgRange+'円'
+    : '⚠ 出来高データなし（出来高関連パターンは非表示）';
+
+  return '<div style="margin-top:12px;border:2px solid var(--orange);border-radius:8px;overflow:hidden">' +
+    '<div style="background:var(--orange-lt);padding:7px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+      '<span style="font-size:13px;font-weight:900">🔬 銘柄固有法則 解析結果</span>' +
+      '<span style="font-size:10px;color:var(--sub)">'+pa.n+'日分のデータより自動解析 ／ '+volInfo+'</span>' +
+      '<button class="btn btn-outline btn-xs" style="margin-left:auto" onclick="S.patternAnalysis=null;R()">✕ 閉じる</button>' +
+    '</div>' +
+    '<div style="font-size:9px;padding:4px 12px;background:#FFFDF0;border-bottom:1px solid var(--border);color:var(--sub)">' +
+      '🔴赤バー=翌日上昇率 ／ 🔵青バー=翌日下落率 ／ ランク S=強力 A=有効 B=弱い C=無効 ?=サンプル不足' +
+    '</div>' +
+    rows +
+  '</div>';
+}
+
+function applyStockData(){
+  var text=S.stockPaste;
+  if(!text.trim()){S.stockStat={type:'err',msg:'データを貼り付けてください'};R();return;}
+  var lines=text.split(/\r?\n/).map(function(l){return l.trim();}).filter(function(l){return l;});
+  var cnt=0;
+  for(var i=0;i<lines.length;i++){
+    var cols=lines[i].split('\t').map(function(c){return c.trim().replace(/,/g,'');});
+    if(cols.length<2)continue;
+    var dstr=parseDateStr(cols[0]);
+    if(!dstr)continue;
+    var nums=[];
+    for(var ci=1;ci<cols.length;ci++){var v=parseFloat(cols[ci]);if(!isNaN(v)&&v>=0)nums.push(v);}
+    if(nums.length===0)continue;
+    if(nums.length===1){S.prices[dstr]=nums[0];cnt++;continue;}
+    if(nums.length===2){S.prices[dstr]=nums[0];S.extVol[dstr]=nums[1];cnt++;continue;}
+    if(nums.length>=4){
+      var o=nums[0],h=nums[1],l=nums[2],c2=nums[3];
+      var hi=Math.max(o,h,l,c2),lo=Math.min(o,h,l,c2);
+      S.extOHLC[dstr]={o:o,h:hi,l:lo,c:c2};
+      S.prices[dstr]=c2;
+      var isMAFmt=nums.length>=6&&nums[4]>0&&Math.abs(nums[4]-c2)/c2<0.20;
+      if(isMAFmt){
+        var ma5imp=nums[4]||null;var ma25imp=nums[5]||null;var ma75imp=(nums.length>=7&&nums[6]>0)?nums[6]:null;
+        if(ma25imp>0||ma75imp>0){
+          S.extMA[dstr]={};
+          if(ma5imp>0)S.extMA[dstr].ma5=ma5imp;
+          if(ma25imp>0)S.extMA[dstr].ma25=ma25imp;
+          if(ma75imp>0)S.extMA[dstr].ma75=ma75imp;
+        }
+        for(var vi=5;vi<nums.length;vi++){if(nums[vi]>c2*10){S.extVol[dstr]=nums[vi];break;}}
+      } else {
+        if(nums.length>=5&&nums[4]>0)S.extVol[dstr]=nums[4];
+      }
+      cnt++;continue;
+    }
+    S.prices[dstr]=nums[nums.length-1];cnt++;
+  }
+  var maCnt=Object.keys(S.extMA).length;
+  S.stockStat=cnt>0
+    ?{type:'ok',msg:'銘柄データ '+cnt+'日分 取り込み完了'+(maCnt>0?' ／ MA '+maCnt+'日分 ✅':'')}
+    :{type:'err',msg:'データを解析できませんでした'};
+  if(cnt>0) S.patternAnalysis = analyzeStockPatterns();
+  lsSaveExt();R();
+}
+
+function applyDowData(){
+  var text=S.dowPaste;
+  if(!text.trim()){S.dowStat={type:'err',msg:'データを貼り付けてください'};R();return;}
+  var lines=text.split(/\r?\n/).map(function(l){return l.trim();}).filter(function(l){return l;});
+  var cnt=0;
+  for(var i=0;i<lines.length;i++){
+    var cols=lines[i].split('\t').map(function(c){return c.trim().replace(/,/g,'');});
+    if(cols.length<2)continue;
+    var dstr=parseDateStr(cols[0]);if(!dstr)continue;
+    var nums=[];
+    for(var ci=1;ci<cols.length;ci++){var v=parseFloat(cols[ci]);if(!isNaN(v)&&v>0)nums.push(v);}
+    if(nums.length===0)continue;
+    var close=nums.length>=4?nums[3]:nums[0];
+    if(isNaN(close)||close<=0)continue;
+    S.extDow[dstr]=close;cnt++;
+  }
+  S.dowStat=cnt>0?{type:'ok',msg:'NYダウ '+cnt+'日分 取り込み完了'}:{type:'err',msg:'データを解析できませんでした'};
+  lsSaveExt();R();
+}
+
+function applyPasteText(){applyStockData();}
+function applyDowText(){applyDowData();}
+function applyVolText(){applyStockData();}
+function applyOHLCText(){applyStockData();}
+
+function candlePattern(dstr){
+  var ohlc=S.extOHLC[dstr];if(!ohlc)return null;
+  var o=ohlc.o,h=ohlc.h,l=ohlc.l,c=ohlc.c;
+  var range=h-l;if(range===0)return 'IP';
+  var body=Math.abs(c-o);var bodyR=body/range;
+  var upShadow=h-Math.max(o,c);var dnShadow=Math.min(o,c)-l;
+  var upR=upShadow/range;var dnR=dnShadow/range;var isBull=c>=o;
+  if(bodyR<=0.05&&dnR>=0.6&&upR<=0.1)return 'TO';
+  if(bodyR<=0.05&&upR>=0.6&&dnR<=0.1)return 'TB';
+  if(bodyR<=0.05)return 'JU';
+  if(dnR>=0.5&&bodyR<=0.2&&upR<=0.1)return 'KA';
+  if(bodyR<=0.2&&upR>=0.1&&dnR>=0.1)return 'KO';
+  if(upR<=0.05&&dnR<=0.05)return 'IP';
+  if(isBull&&bodyR>=0.6)return 'BY';
+  if(!isBull&&bodyR>=0.6)return 'BN';
+  if(isBull&&dnR>=bodyR*2)return 'DY';
+  if(!isBull&&upR>=bodyR*2)return 'UN';
+  if(isBull&&upR>=bodyR*2)return 'UY';
+  if(!isBull&&dnR>=bodyR*2)return 'DN';
+  if(isBull)return 'SY';
+  return 'SN';
+}
+
+function candleName(pattern){
+  var names={'BY':'大陽線','SY':'小陽線','DY':'下ヒゲ陽線','UY':'上ヒゲ陽線','BN':'大陰線','SN':'小陰線','DN':'下ヒゲ陰線','UN':'上ヒゲ陰線','KA':'カラカサ','TO':'トンボ','TB':'トウバ','JU':'十字線','KO':'コマ','IP':'一本線'};
+  return names[pattern]||'';
+}
+
+function detectChartPattern(series){
+  var n=series.length;if(n<15)return null;
+  var r=series.slice(Math.max(0,n-30));var len=r.length;
+  var peaks=[],troughs=[];
+  for(var i=1;i<len-1;i++){
+    if(r[i]>=r[i-1]&&r[i]>=r[i+1])peaks.push({i:i,v:r[i]});
+    if(r[i]<=r[i-1]&&r[i]<=r[i+1])troughs.push({i:i,v:r[i]});
+  }
+  var cur=r[len-1];
+  if(troughs.length>=2){var t1=troughs[troughs.length-2],t2=troughs[troughs.length-1];if(Math.abs(t1.v-t2.v)/Math.max(t1.v,t2.v)<0.04&&t2.i>t1.i+3){var neck=0;for(var pi=0;pi<peaks.length;pi++)if(peaks[pi].i>t1.i&&peaks[pi].i<t2.i)neck=Math.max(neck,peaks[pi].v);if(neck>0&&cur>=neck*0.99)return{label:'📈ダブルボトム',cl:'var(--red)',bg:'var(--red-lt)'};}}
+  if(peaks.length>=2){var p1=peaks[peaks.length-2],p2=peaks[peaks.length-1];if(Math.abs(p1.v-p2.v)/Math.max(p1.v,p2.v)<0.04&&p2.i>p1.i+3){var neck=Infinity;for(var ti=0;ti<troughs.length;ti++)if(troughs[ti].i>p1.i&&troughs[ti].i<p2.i)neck=Math.min(neck,troughs[ti].v);if(neck<Infinity&&cur<=neck*1.01)return{label:'📉ダブルトップ',cl:'var(--blue)',bg:'var(--blue-lt)'};}}
+  return null;
+}
+
+const LS_PRE='katotre_';
+const LS_PRICES=LS_PRE+'prices';
+const LS_META=LS_PRE+'meta';
+const LS_DOW=LS_PRE+'extdow';
+const LS_MA =LS_PRE+'extma';
+function lsKey(y,m){return LS_PRE+y+'_'+String(m).padStart(2,'0');}
+
+function lsSaveExt(){
+  try{
+    if(Object.keys(S.extDow).length)localStorage.setItem(LS_DOW,JSON.stringify(S.extDow));
+    if(Object.keys(S.extVol).length)localStorage.setItem('katotre_extvol',JSON.stringify(S.extVol));
+    if(Object.keys(S.extOHLC).length)localStorage.setItem('katotre_ohlc',JSON.stringify(S.extOHLC));
+    if(Object.keys(S.extMA).length)localStorage.setItem(LS_MA,JSON.stringify(S.extMA));
+  }catch(e){console.warn('ext save err',e);}
+}
+function lsLoadExt(){
+  try{let r=localStorage.getItem(LS_DOW);if(r)S.extDow=JSON.parse(r);}catch(e){}
+  try{let r=localStorage.getItem('katotre_extvol');if(r)S.extVol=JSON.parse(r);}catch(e){}
+  try{let r=localStorage.getItem('katotre_ohlc');if(r)S.extOHLC=JSON.parse(r);}catch(e){}
+  try{let r=localStorage.getItem(LS_MA);if(r)S.extMA=JSON.parse(r);}catch(e){}
+}
+
+function lsSave(){
+  try{
+    const md={revealed:S.revealed,orders:S.orders,settles:S.settles,
+      groups:S.groups,carries:S.carries,gi:S.gi,idc:S.idc,groupMemos:S.groupMemos,predLog:S.predLog};
+    localStorage.setItem(lsKey(S.year,S.month),JSON.stringify(md));
+    localStorage.setItem(LS_PRICES,JSON.stringify(S.prices));
+    localStorage.setItem(LS_META,JSON.stringify({
+      stock:S.stock,code:S.code,capital:S.capital,shares:S.shares,
+      prevP:S.prevP,memo:S.memo,fukumi:S.fukumi,rule3On:S.rule3On,rule3Pct:S.rule3Pct,year:S.year,month:S.month
+    }));
+  }catch(e){console.warn('save err',e);}
+  lsSaveExt();
+}
+
+function lsLoadMonth(y,m){
+  try{
+    const raw=localStorage.getItem(lsKey(y,m));if(!raw)return false;
+    const d=JSON.parse(raw);
+    S.revealed=d.revealed||0;S.orders=d.orders||{};S.settles=d.settles||{};
+    S.groups=d.groups||mkGroups();S.carries=d.carries||Array.from({length:12},()=>[]);
+    S.gi=d.gi||0;S.idc=d.idc||1;S.groupMemos=d.groupMemos||Array.from({length:12},()=>'');
+    S.predLog=d.predLog||{};return true;
+  }catch(e){return false;}
+}
+
+function lsLoadPrices(){try{const r=localStorage.getItem(LS_PRICES);if(r)S.prices=JSON.parse(r);}catch(e){}}
+
+function lsLoadMeta(){
+  try{
+    const r=localStorage.getItem(LS_META);if(!r)return;
+    const d=JSON.parse(r);
+    S.stock=d.stock||'';S.code=d.code||'';S.capital=d.capital||'';S.shares=d.shares||'';
+    S.prevP=d.prevP||'';S.memo=d.memo||'';S.fukumi=d.fukumi||'';
+    if(d.rule3On!==undefined)S.rule3On=d.rule3On;
+    if(d.rule3Pct)S.rule3Pct=d.rule3Pct;
+    if(d.year)S.year=d.year;if(d.month)S.month=d.month;
+  }catch(e){}
+}
+
+function lsClearMonth(y,m){
+  if(!confirm(y+'年'+m+'月のデータを消去しますか？'))return;
+  localStorage.removeItem(lsKey(y,m));resetMonthData();R();
+}
+
+function lsClearAll(){
+  if(!confirm('全データを消去しますか？この操作は元に戻せません。'))return;
+  Object.keys(localStorage).filter(k=>k.startsWith(LS_PRE)).forEach(k=>localStorage.removeItem(k));
+  location.reload();
+}
+
+function lsSavedList(){
+  return Object.keys(localStorage)
+    .filter(k=>/^katotre_\d{4}_\d{2}$/.test(k))
+    .map(k=>{const p=k.replace(LS_PRE,'').split('_');return {y:+p[0],m:+p[1]};})
+    .filter(x=>!isNaN(x.y)&&!isNaN(x.m))
+    .sort((a,b)=>a.y!==b.y?a.y-b.y:a.m-b.m);
+}
+
+function rSavedList(){
+  const list=lsSavedList();
+  if(!list.length)return '<span style="color:var(--muted)">なし</span>';
+  return list.map(function(x){
+    const cur=x.y===S.year&&x.m===S.month;
+    const bg=cur?'var(--blue-lt)':'#F5F7FA';
+    const fw=cur?'700':'400';
+    const bdr=cur?'1px solid var(--blue)':'1px solid var(--border)';
+    return '<span style="background:'+bg+';border:'+bdr+';border-radius:4px;padding:1px 7px;cursor:pointer;font-weight:'+fw+'" '
+      +'onclick="S.year='+x.y+';S.month='+x.m+';lsLoadMonth('+x.y+','+x.m+')||resetMonthData();R()">'+x.y+'/'+x.m+'</span>';
+  }).join(' ');
+}
+
+function prevMonthKey(y,m){if(m===1)return LS_PRE+(y-1)+'_12';return LS_PRE+y+'_'+String(m-1).padStart(2,'0');}
+
+function getPrevUnsettled(y,m){
+  try{
+    const raw=localStorage.getItem(prevMonthKey(y,m));if(!raw)return [];
+    const d=JSON.parse(raw);const groups=d.groups||[];const settles=d.settles||{};
+    const settledIds=new Set();Object.values(settles).forEach(ss=>ss.forEach(s=>settledIds.add(s.posId)));
+    const entries=[];
+    groups.forEach(g=>{
+      (g.buys||[]).forEach(e=>{if(!e.settled&&!settledIds.has(e.id))entries.push({...e,type:'buy'});});
+      (g.sells||[]).forEach(e=>{if(!e.settled&&!settledIds.has(e.id))entries.push({...e,type:'sell'});});
+    });
+    return entries;
+  }catch(e){return [];}
+}
+
+function calcPrevMonthProfit(y,m){
+  try{
+    const raw=localStorage.getItem(prevMonthKey(y,m));if(!raw)return 0;
+    const d=JSON.parse(raw);const groups=d.groups||[];const settles=d.settles||{};
+    const sh=Math.max(Number(S.shares)||1,1);const allEntries={};
+    groups.forEach(g=>{(g.buys||[]).forEach(e=>{allEntries[e.id]=e;});(g.sells||[]).forEach(e=>{allEntries[e.id]=e;});});
+    let total=0;
+    Object.values(settles).forEach(ss=>ss.forEach(s=>{
+      const e=allEntries[s.posId];if(!e||!e.price||!s.exitPrice)return;
+      total+=(e.type==='buy'?s.exitPrice-e.price:e.price-s.exitPrice)*sh;
+    }));
+    return Math.round(total);
+  }catch(e){return 0;}
+}
+
+function applyCarryOver(y,m){
+  const entries=getPrevUnsettled(y,m);if(!entries.length)return false;
+  entries.forEach(e=>{
+    const newId=S.idc++;const newEntry={id:newId,date:e.date,price:e.price,type:e.type,settled:false};
+    if(e.type==='buy'){S.groups[0].buys.push(newEntry);S.groups[0].buys.sort((a,b)=>(b.price||0)-(a.price||0));}
+    else {S.groups[0].sells.push(newEntry);S.groups[0].sells.sort((a,b)=>(b.price||0)-(a.price||0));}
+  });
+  return true;
+}
+
+/* ═══════════════════════ 予測的中率分析 ═══════════════════════ */
+function calcPredStats(){
+  var logDates=Object.keys(S.predLog).sort();
+  if(logDates.length===0)return null;
+  var allPriceDates=Object.keys(S.prices).sort();
+  var results=[];
+  for(var i=0;i<logDates.length;i++){
+    var d=logDates[i];
+    var pred=S.predLog[d];
+    var curP=S.prices[d];
+    if(!curP||!pred)continue;
+    var nextP=null;
+    for(var j=0;j<allPriceDates.length;j++){
+      if(allPriceDates[j]>d){nextP=S.prices[allPriceDates[j]];break;}
+    }
+    if(!nextP)continue;
+    var actualDir=nextP>curP?'up':nextP<curP?'down':null;
+    if(!actualDir)continue;
+    var ok=(pred.dir===actualDir);
+    results.push({date:d,pred:pred,actualDir:actualDir,ok:ok,curP:curP,nextP:nextP});
+  }
+  if(results.length===0)return null;
+  var totalOk=results.filter(function(r){return r.ok;}).length;
+  var total=results.length;
+
+  function sigStats(filterFn,label,icon){
+    var rs=results.filter(filterFn);
+    if(rs.length===0)return null;
+    var ok2=rs.filter(function(r){return r.ok;}).length;
+    var pct=Math.round(ok2/rs.length*100);
+    var rank=pct>=70?'S':pct>=60?'A':'B';
+    return {label:label,icon:icon,ok:ok2,total:rs.length,pct:pct,rank:rank};
+  }
+  function predLevel(p){var lv=classify5Level(p);return lv?lv.level:3;}
+
+  var byLevel=[
+    sigStats(function(r){return predLevel(r.pred)===5;},'📈 買い優勢',''),
+    sigStats(function(r){return predLevel(r.pred)===4;},'🔼 やや強気',''),
+    sigStats(function(r){return predLevel(r.pred)===3;},'⚡ 中立',''),
+    sigStats(function(r){return predLevel(r.pred)===2;},'🔽 やや弱気',''),
+    sigStats(function(r){return predLevel(r.pred)===1;},'📉 売り優勢',''),
+  ].filter(Boolean);
+
+  var byStars=[
+    sigStats(function(r){return r.pred.stars===3;},'★★★ 高確信','⭐'),
+    sigStats(function(r){return r.pred.stars===2;},'★★ 中確信',''),
+    sigStats(function(r){return r.pred.stars===1;},'★ 低確信',''),
+  ].filter(Boolean);
+
+  var bySignal=[
+    sigStats(function(r){return r.pred.maCross==='GC75'||r.pred.maCross==='DC75';},'MAクロス(25×75)','🌟'),
+    sigStats(function(r){return r.pred.maCross==='GC25'||r.pred.maCross==='DC25';},'MAクロス(5×25)','✨'),
+    sigStats(function(r){return !r.pred.maCross&&r.pred.score>=4;},'スコア高(+4以上)','💪'),
+    sigStats(function(r){return !r.pred.maCross&&r.pred.score<=-4;},'スコア低(-4以下)','📉'),
+    sigStats(function(r){return r.pred.bayesProb>=70;},'ベイズ70%以上','📊'),
+    sigStats(function(r){return r.pred.bayesProb<=30;},'ベイズ30%以下','📊'),
+    sigStats(function(r){return r.pred.isRange===true;},'レンジ相場','〰'),
+    sigStats(function(r){return !r.pred.isRange&&r.pred.chop<40;},'トレンド相場','📈'),
+  ].filter(Boolean);
+
+  var timeline=results.slice(-30);
+
+  var byMonth={};
+  results.forEach(function(r){
+    var ym=r.date.slice(0,7);
+    if(!byMonth[ym])byMonth[ym]={ok:0,total:0};
+    byMonth[ym].total++;
+    if(r.ok)byMonth[ym].ok++;
+  });
+  var monthList=Object.keys(byMonth).sort().map(function(ym){
+    var mv=byMonth[ym];return {ym:ym,pct:Math.round(mv.ok/mv.total*100),ok:mv.ok,total:mv.total};
+  });
+
+  return {total:total,totalOk:totalOk,totalPct:Math.round(totalOk/total*100),
+    byLevel:byLevel,byStars:byStars,bySignal:bySignal,timeline:timeline,monthList:monthList};
+}
+
+function rPredStats(){
+  var stats=calcPredStats();
+  var panelId='pred-stats-body';
+
+  // ヘッダー部分
+  var hdrRight='<span style="margin-left:auto;font-size:10px;color:var(--sub)">'+(S.predStatsOpen?'▲':'▼')+'</span>';
+
+  if(!stats){
+    var emptyBody='';
+    if(S.predStatsOpen){
+      emptyBody='<div class="cb" style="text-align:center;padding:24px">'
+        +'<div style="font-size:32px;margin-bottom:8px">📅</div>'
+        +'<div style="font-weight:700;font-size:13px;margin-bottom:6px">まだデータがありません</div>'
+        +'<div style="font-size:11px;color:var(--sub);line-height:1.9">'
+        +'翌日更新ボタンを毎日押すと予測ログが自動蓄積されます。<br>'
+        +'<b>30日分</b>でシグナルの傾向が見え始め<br>'
+        +'<b>100日分</b>でかなり精度の高い分析ができます'
+        +'</div></div>';
+    }
+    return '<div class="card">'
+      +'<div class="ch" style="cursor:pointer" onclick="S.predStatsOpen=!S.predStatsOpen;R()">'
+      +'<span>📊 予測的中率分析</span>'
+      +'<span style="font-size:10px;color:var(--muted)">翌日更新を積み重ねるとシグナル別の当たり率がわかります</span>'
+      +hdrRight+'</div>'+emptyBody+'</div>';
+  }
+
+  function pctColor(pct){return pct>=70?'var(--green)':pct>=55?'var(--orange)':'var(--red)';}
+  function rankCls(rank){return rank==='S'?'ps-rank-s':rank==='A'?'ps-rank-a':'ps-rank-b';}
+
+  function sigCard(item){
+    var cl=pctColor(item.pct);
+    var rankLabel=item.rank==='S'?'S：非常に信頼できる':item.rank==='A'?'A：信頼できる':'B：参考程度';
+    var advice=item.pct>=70?'✅ このシグナルは信頼できます':item.pct>=55?'△ まあまあ使えます':'❌ このシグナルは効いていません';
+    return '<div class="ps-card '+rankCls(item.rank)+'">'
+      +'<div class="ps-head">'
+      +(item.icon?'<span>'+item.icon+'</span>':'')
+      +'<span>'+item.label+'</span>'
+      +'<span style="margin-left:auto;font-size:9px;color:var(--sub)">'+rankLabel+'</span>'
+      +'</div>'
+      +'<div class="ps-body">'
+      +'<div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px">'
+      +'<span class="ps-pct" style="color:'+cl+'">'+item.pct+'%</span>'
+      +'<span class="ps-n">'+item.ok+'/'+item.total+'日的中</span>'
+      +'</div>'
+      +'<div class="ps-bar-wrap"><div class="ps-bar-fill" style="width:'+item.pct+'%;background:'+cl+'"></div></div>'
+      +'<div style="font-size:9px;color:var(--sub);margin-top:3px">'+advice+'</div>'
+      +'</div></div>';
+  }
+
+  function sigSection(arr, title){
+    if(!arr||!arr.length)return '';
+    var cards=arr.map(sigCard).join('');
+    return '<div style="margin-bottom:12px">'
+      +'<div style="font-size:11px;font-weight:700;color:var(--sub);padding:0 14px 6px;border-bottom:1px solid var(--border);margin-bottom:8px">'+title+'</div>'
+      +'<div class="ps-grid">'+cards+'</div>'
+      +'</div>';
+  }
+
+  // タイムライン
+  var tlRows=stats.timeline.map(function(r){
+    var dotCls=r.ok?'ps-dot-ok':'ps-dot-ng';
+    var predLv=classify5Level(r.pred);
+    var predLabel=predLv?predLv.emoji+predLv.label:'?';
+    var chgPct=Math.round((r.nextP-r.curP)/r.curP*100*10)/10;
+    var updown=r.actualDir==='up'?'↑上昇':'↓下落';
+    var udcl=r.actualDir==='up'?'var(--red)':'var(--blue)';
+    var hitcl=r.ok?'var(--green)':'var(--red)';
+    return '<div class="ps-trow">'
+      +'<div class="'+dotCls+'"></div>'
+      +'<span style="color:var(--sub);min-width:38px">'+r.date.slice(5)+'</span>'
+      +'<span style="min-width:88px">'+predLabel+'</span>'
+      +'<span style="color:var(--sub)">→</span>'
+      +'<span style="color:'+udcl+';font-weight:700">'+updown+'</span>'
+      +'<span style="font-size:10px;color:'+hitcl+';">'+(r.ok?'✓的中':'✗外れ')+'</span>'
+      +'<span style="font-size:10px;color:var(--sub)">('+( chgPct>=0?'+':'')+chgPct+'%)</span>'
+      +'</div>';
+  }).join('');
+
+  // 月別
+  var monthRows=stats.monthList.map(function(mv){
+    var cl=pctColor(mv.pct);
+    return '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;font-size:11px;border-bottom:1px solid #F5F7FA">'
+      +'<span style="min-width:54px;color:var(--sub)">'+mv.ym+'</span>'
+      +'<div style="flex:1;height:14px;background:#E8EDF2;border-radius:3px;overflow:hidden">'
+      +'<div style="width:'+mv.pct+'%;height:100%;background:'+cl+';border-radius:3px"></div>'
+      +'</div>'
+      +'<span style="font-weight:700;color:'+cl+';min-width:36px">'+mv.pct+'%</span>'
+      +'<span style="font-size:10px;color:var(--muted)">'+mv.ok+'/'+mv.total+'</span>'
+      +'</div>';
+  }).join('');
+
+  var totalCl=pctColor(stats.totalPct);
+  var advice=stats.totalPct>=65?'全体的に良好！信頼できるシグナルを中心に使いましょう':
+    stats.totalPct>=50?'コイントスよりやや良い状態。Sランクシグナルだけに絞るのがおすすめ':
+    '苦戦中。データを増やすか、銘柄に合ったシグナルを絞り込みましょう';
+  var adviceBg=stats.totalPct>=65?'var(--green-lt)':stats.totalPct>=50?'var(--warn-lt)':'var(--red-lt)';
+
+  // ヘッダー
+  var hdr='<div class="ch" style="cursor:pointer" onclick="S.predStatsOpen=!S.predStatsOpen;R()">'
+    +'<span>📊 予測的中率分析</span>'
+    +'<span style="font-size:12px;font-weight:700;color:'+totalCl+'">全体 '+stats.totalPct+'%</span>'
+    +'<span style="font-size:10px;color:var(--sub)">'+stats.total+'日分のデータ</span>'
+    +'<span style="font-size:10px;color:var(--sub)">'+advice+'</span>'
+    +hdrRight+'</div>';
+
+  if(!S.predStatsOpen) return '<div class="card">'+hdr+'</div>';
+
+  // サマリー
+  var summary='<div style="display:flex;align-items:center;gap:20px;padding:12px 18px;background:#FAFBFC;border-bottom:1px solid var(--border);flex-wrap:wrap">'
+    +'<div style="text-align:center">'
+    +'<div style="font-size:36px;font-weight:900;color:'+totalCl+'">'+stats.totalPct+'%</div>'
+    +'<div style="font-size:10px;color:var(--sub)">全体的中率</div>'
+    +'<div style="font-size:10px;color:var(--sub)">'+stats.totalOk+'/'+stats.total+'日</div>'
+    +'</div>'
+    +'<div style="flex:1;min-width:160px">'
+    +'<div class="ps-bar-wrap" style="height:14px">'
+    +'<div class="ps-bar-fill" style="width:'+stats.totalPct+'%;background:'+totalCl+'"></div>'
+    +'</div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-top:2px">'
+    +'<span>0%</span><span>コイントス(50%)</span><span>100%</span>'
+    +'</div>'
+    +'<div style="margin-top:8px;font-size:11px;color:var(--sub);background:'+adviceBg+';padding:5px 10px;border-radius:5px">'+advice+'</div>'
+    +'</div></div>';
+
+  // 月別セクション
+  var monthSection='';
+  if(stats.monthList.length>1){
+    monthSection='<div style="margin-bottom:12px">'
+      +'<div style="font-size:11px;font-weight:700;color:var(--sub);padding:6px 14px;border-bottom:1px solid var(--border)">📅 月別的中率の推移</div>'
+      +'<div style="padding:8px 14px">'+monthRows+'</div>'
+      +'</div>';
+  }
+
+  // タイムラインセクション
+  var tlSection='<div>'
+    +'<div style="font-size:11px;font-weight:700;color:var(--sub);padding:6px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px">'
+    +'<span>🕐 直近'+stats.timeline.length+'日の予測履歴</span>'
+    +'<span style="font-size:10px;font-weight:400">'
+    +'<span style="color:var(--green)">●的中</span>'
+    +'<span style="margin-left:6px;color:var(--red)">●外れ</span>'
+    +'</span></div>'
+    +'<div class="ps-timeline">'+tlRows+'</div>'
+    +'</div>';
+
+  return '<div class="card">'+hdr+summary
+    +sigSection(stats.byLevel,'🎯 予測レベル別の的中率')
+    +sigSection(stats.byStars,'⭐ 確信度（★）別の的中率')
+    +sigSection(stats.bySignal,'🔍 シグナル別の的中率')
+    +monthSection+tlSection+'</div>';
+}
+
+let _saveTimer=null;
+function R(){
+  buildCache();
+  document.getElementById('app').innerHTML=rApp();
+  clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(lsSave,400);
+}
+
+function rApp(){
+  const days=C.days;
+  const warns=warnPositions();
+  const lastDs_=C.lastD;
+  return `
+    ${rCtrl(days)}
+    ${warns.length?rBanner(warns):''}
+    ${rRealtime()}
+    ${rPriceSetup(days)}
+    ${rSosai()}
+    ${rHighLow(days)}
+    <div class="layout">
+      <div class="left-panel">
+        <div class="card">
+          <div class="ch">
+            <span>📈 トレード記録</span>
+            <span class="tag-note">${S.stock||'銘柄未設定'}${S.code?' ('+S.code+')':''}</span>
+            <span style="font-size:10px;color:var(--purple);background:var(--purple-lt);border-radius:4px;padding:1px 5px">紫行＝両建て</span>
+          </div>
+          <div class="table-wrap">${rTable(days)}</div>
+        </div>
+      </div>
+      <div class="right-panel"><div class="memo-sticky">${rMemo()}</div></div>
+    </div>
+    ${rBottom()}
+    ${rPredStats()}
+    <div class="fixed-reveal">
+      <span class="rev-info">公開 ${S.revealed}/${days.length}日${lastDs_?' 〜'+fd(lastDs_):''}</span>
+      <button class="btn btn-green" onclick="reveal()" ${S.revealed>=days.length?'disabled':''}>📅 翌日更新</button>
+      <button class="btn btn-outline" style="background:#fff;font-size:13px;padding:9px 18px;box-shadow:0 3px 10px rgba(0,0,0,.22)" onclick="advGrp()" ${S.gi>=11?'disabled':''}>次${S.gi<11?NUMS[S.gi+1]:''}▶</button>
+    </div>`;
+}
+
+function rBanner(arr){
+  const lastD=C.lastD;
+  const items=arr.map(e=>{
+    const expired=lastD&&isExp(e.date,lastD);
+    return `<span style="margin-right:10px">
+      <span class="${e.type==='buy'?'tb':'ts'}">${e.type==='buy'?'○':'×'}</span>
+      ${fd(e.date)} → 期限:${fd(addM6(e.date))}
+      ${expired?'<span style="color:var(--red);font-weight:700"> ⚠期限超過</span>':'<span style="color:var(--warn)"> ⚠30日以内</span>'}
+    </span>`;
+  }).join('');
+  return `<div class="expire-banner">⚠️ 信用期限アラート<span class="items">${items}</span></div>`;
+}
+
+function rCtrl(days){
+  const lastDs_=S.revealed>0?ds(days[S.revealed-1]):null;
+  return `<div class="card"><div class="ctrl-bar">
+    <div class="ctrl">
+      <input type="number" style="width:62px;text-align:right" value="${S.year}"
+        onchange="S.year=+this.value||S.year;(function(){if(!lsLoadMonth(S.year,S.month)){resetMonthData();applyCarryOver(S.year,S.month);if(!S.prevP){const pp=calcPrevMonthProfit(S.year,S.month);if(pp)S.prevP=String(pp);}}R();})()">
+      <label style="margin:0 6px 0 2px">年</label>
+      <input type="number" style="width:44px;text-align:right" min="1" max="12" value="${S.month}"
+        onchange="S.month=Math.min(12,Math.max(1,+this.value||1));(function(){if(!lsLoadMonth(S.year,S.month)){resetMonthData();applyCarryOver(S.year,S.month);if(!S.prevP){const pp=calcPrevMonthProfit(S.year,S.month);if(pp)S.prevP=String(pp);}}R();})()">
+      <label style="margin:0 10px 0 2px">月</label>
+    </div>
+    <div class="ctrl"><label>銘柄</label>
+      <input type="text" style="width:115px" value="${S.stock}" oninput="S.stock=this.value">
+    </div>
+    <div class="ctrl"><label>証券コード</label>
+      <input type="text" style="width:72px" value="${S.code}" oninput="S.code=this.value">
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span style="font-size:11px;color:var(--sub)">公開:${S.revealed}/${days.length}日${lastDs_?' (〜'+fd(lastDs_)+')':''}</span>
+      <button class="btn btn-green" onclick="reveal()">📅 翌日更新</button>
+      <button class="btn btn-outline btn-sm" onclick="revealAll()">全表示</button>
+      <button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red-md)" onclick="lsClearMonth(S.year,S.month)">🗑 今月消去</button>
+      <button class="btn btn-outline btn-sm" style="color:var(--red)" onclick="lsClearAll()">⚠ 全消去</button>
+    </div>
+  </div>
+  <div style="padding:4px 14px;background:#FFF8F0;border-top:1px solid var(--border);font-size:11px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-weight:700;color:var(--orange)">📏 ルール間隔</span>
+    <button class="btn btn-sm" style="padding:2px 10px;background:${S.rule3On?'var(--blue)':'#E0E0E0'};color:${S.rule3On?'#fff':'var(--sub)'}" onclick="S.rule3On=!S.rule3On;R()">
+      ${S.rule3On?'ON':'OFF'}
+    </button>
+    <div class="ctrl" style="${S.rule3On?'':'opacity:.4;pointer-events:none'}">
+      <label>間隔</label>
+      <input type="number" style="width:50px" min="1" max="10" step="0.5" value="${S.rule3Pct}" oninput="S.rule3Pct=Math.min(10,Math.max(0.5,+this.value||3));R()">
+      <span>%</span>
+      <span style="font-size:10px;color:var(--sub)">(${C.lastD&&S.prices[C.lastD]?fn(Math.round(S.prices[C.lastD]*(S.rule3Pct/100)))+'円以上の間隔':'終値公開後に表示'})</span>
+    </div>
+    <span style="font-size:10px;color:var(--sub)">同方向の新規追加に${S.rule3Pct}%の価格差が必要</span>
+  </div>
+  <div style="padding:4px 14px;background:#FAFBFC;border-top:1px solid var(--border);font-size:10px;color:var(--sub);display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+    <span style="font-weight:700">💾 保存済み:</span>
+    ${rSavedList()}
+  </div>
+  </div>`;
+}
+
+function rRealtime(){
+  return `<div class="card">
+    <div class="ch" style="cursor:pointer" onclick="S.rtOpen=!S.rtOpen;R()">
+      <span>📡 本日データ入力 <span style="font-size:10px;font-weight:400;color:var(--sub)">（リアルタイム実トレード用）</span></span>
+      ${S.rtC?`<span style="font-size:10px;font-weight:700;color:var(--green)">✅ ${S.rtDate} 入力済</span>`:'<span style="font-size:10px;color:var(--muted)">本日の株価・NYダウを入力すると翌日予測が即時更新</span>'}
+      <span style="margin-left:auto;font-size:10px;color:var(--sub)">${S.rtOpen?'▲':'▼'}</span>
+    </div>
+    ${S.rtOpen?`<div class="cb" style="padding:12px 14px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+        <div><div style="font-size:10px;font-weight:700;margin-bottom:3px">📅 年月日</div>
+          <input type="text" placeholder="2025/05/03" value="${S.rtDate}" style="width:105px;padding:5px 7px;border:1.5px solid var(--border);border-radius:5px;font-size:12px" oninput="S.rtDate=this.value"></div>
+        <div><div style="font-size:10px;font-weight:700;margin-bottom:3px">終値</div>
+          <input type="number" placeholder="2100" value="${S.rtC}" style="width:80px;padding:5px 7px;border:1.5px solid var(--border);border-radius:5px;font-size:12px" oninput="S.rtC=this.value"></div>
+        <div><div style="font-size:10px;font-weight:700;margin-bottom:3px;color:var(--sub)">始値</div>
+          <input type="number" placeholder="2080" value="${S.rtO}" style="width:76px;padding:5px 7px;border:1.5px solid var(--border);border-radius:5px;font-size:12px" oninput="S.rtO=this.value"></div>
+        <div><div style="font-size:10px;font-weight:700;margin-bottom:3px;color:var(--red)">高値</div>
+          <input type="number" placeholder="2120" value="${S.rtH}" style="width:76px;padding:5px 7px;border:1.5px solid var(--red-md);border-radius:5px;font-size:12px" oninput="S.rtH=this.value"></div>
+        <div><div style="font-size:10px;font-weight:700;margin-bottom:3px;color:var(--blue)">安値</div>
+          <input type="number" placeholder="2070" value="${S.rtL}" style="width:76px;padding:5px 7px;border:1.5px solid var(--blue-md);border-radius:5px;font-size:12px" oninput="S.rtL=this.value"></div>
+        <div><div style="font-size:10px;font-weight:700;margin-bottom:3px;color:var(--sub)">出来高</div>
+          <input type="text" placeholder="1,200,000" value="${S.rtVol}" style="width:100px;padding:5px 7px;border:1.5px solid var(--border);border-radius:5px;font-size:12px" oninput="S.rtVol=this.value.replace(/,/g,'')"></div>
+        <div><div style="font-size:10px;font-weight:700;margin-bottom:3px;color:var(--sub)">🇺🇸 NYダウ終値</div>
+          <input type="number" placeholder="39800" value="${S.rtDow}" style="width:90px;padding:5px 7px;border:1.5px solid var(--border);border-radius:5px;font-size:12px" oninput="S.rtDow=this.value"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+        <button class="btn btn-green btn-sm" style="font-weight:700;padding:5px 16px" onclick="applyRealtimeData()">✅ 反映して予測更新</button>
+        <button class="btn btn-outline btn-sm" onclick="S.rtDate='';S.rtO='';S.rtH='';S.rtL='';S.rtC='';S.rtVol='';S.rtDow='';S.rtStat=null;R()">🗑 クリア</button>
+        ${S.rtStat?`<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;background:${S.rtStat.type==='ok'?'var(--green-lt)':'var(--red-lt)'};color:${S.rtStat.type==='ok'?'var(--green)':'var(--red)'}">${S.rtStat.msg}</span>`:''}
+      </div>
+    </div>`:''}
+  </div>`;
+}
+
+function applyRealtimeData(){
+  var dstr=parseDateStr(S.rtDate);
+  if(!dstr){S.rtStat={type:'err',msg:'❌ 日付が正しくありません'};R();return;}
+  var c=parseFloat(S.rtC);
+  if(isNaN(c)||c<=0){S.rtStat={type:'err',msg:'❌ 終値を入力してください'};R();return;}
+  S.prices[dstr]=c;
+  var o=parseFloat(S.rtO),h=parseFloat(S.rtH),l=parseFloat(S.rtL);
+  if(!isNaN(o)&&!isNaN(h)&&!isNaN(l)&&o>0&&h>0&&l>0){S.extOHLC[dstr]={o:o,h:h,l:l,c:c};localStorage.setItem('katotre_ohlc',JSON.stringify(S.extOHLC));}
+  var vol=parseFloat(S.rtVol);
+  if(!isNaN(vol)&&vol>0){S.extVol[dstr]=vol;localStorage.setItem('katotre_extvol',JSON.stringify(S.extVol));}
+  var dow=parseFloat(S.rtDow);
+  if(!isNaN(dow)&&dow>0){S.extDow[dstr]=dow;localStorage.setItem('katotre_extdow',JSON.stringify(S.extDow));}
+  lsSave();
+  S.rtStat={type:'ok',msg:'✅ '+dstr+' 反映完了'};
+  R();
+}
+
+function rPriceSetup(days){
+  const loaded=days.filter(d=>S.prices[ds(d)]).length;
+  const total=days.length;
+  const pct=total?Math.round(loaded/total*100):0;
+  const barColor=pct===100?'var(--green)':'var(--blue)';
+  return `<div class="card">
+    <div class="ch" style="cursor:pointer" onclick="S.prOpen=!S.prOpen;R()">
+      <span>📊 終値データ設定</span>
+      <span style="font-size:11px;color:${pct===100&&total>0?'var(--green)':'var(--sub)'}">
+        ${loaded}/${total}日 読込済 (${pct}%)
+      </span>
+      <div style="flex:0 0 100px;background:#E8EDF2;border-radius:4px;height:6px">
+        <div style="width:${pct}%;background:${barColor};height:6px;border-radius:4px;transition:width .3s"></div>
+      </div>
+      <span style="margin-left:auto;font-size:10px;color:var(--sub)">翌日更新で1日ずつ公開　${S.prOpen?'▲':'▼'}</span>
+    </div>
+    ${S.prOpen?rPriceSetupBody(days):''}
+  </div>`;
+}
+
+function rPriceSetupBody(days){
+  var stockCnt=Object.keys(S.prices).length;
+  var ohlcCnt=Object.keys(S.extOHLC).length;
+  var volCnt=Object.keys(S.extVol).length;
+  var dowCnt=Object.keys(S.extDow).length;
+  var maCnt=Object.keys(S.extMA).length;
+
+  return `<div class="cb" style="padding:12px 14px">
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div style="flex:1;min-width:260px">
+        <div style="font-size:12px;font-weight:700;margin-bottom:4px">📊 銘柄データ</div>
+        <div style="font-size:10px;color:var(--sub);margin-bottom:4px">読込済: 終値${stockCnt}日 / OHLC${ohlcCnt}日 / 出来高${volCnt}日${maCnt>0?' / MA '+maCnt+'日':''}</div>
+        <textarea style="width:100%;height:90px;font-size:11px;font-family:monospace;border:1.5px solid var(--border);border-radius:4px;padding:4px"
+          placeholder="日付&#9;始値&#9;高値&#9;安値&#9;終値&#9;出来高"
+          oninput="S.stockPaste=this.value">${S.stockPaste||''}</textarea>
+        <div style="display:flex;gap:6px;margin-top:4px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-blue btn-sm" onclick="applyStockData()">✅ 取り込む</button>
+          <button class="btn btn-outline btn-sm" onclick="S.stockPaste='';S.stockStat=null;R()">クリア</button>
+          <button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red-md)"
+            onclick="if(confirm('銘柄データを全てクリアしますか？')){S.prices={};S.extOHLC={};S.extVol={};S.extMA={};localStorage.removeItem(LS_MA);S.stockStat=null;localStorage.removeItem('katotre_ohlc');localStorage.removeItem('katotre_extvol');R()}">🗑 全クリア</button>
+        </div>
+        ${S.stockStat?`<div style="font-size:10px;margin-top:4px;padding:3px 8px;border-radius:4px;font-weight:700;background:${S.stockStat.type==='ok'?'var(--green-lt)':'var(--red-lt)'};color:${S.stockStat.type==='ok'?'var(--green)':'var(--red)'}">${S.stockStat.msg}</div>`:''}
+        ${rPatternAnalysis()}
+      </div>
+      <div style="flex:1;min-width:260px">
+        <div style="font-size:12px;font-weight:700;margin-bottom:4px">🇺🇸 NYダウデータ</div>
+        <div style="font-size:10px;color:var(--sub);margin-bottom:4px">読込済: ${dowCnt}日分</div>
+        <textarea style="width:100%;height:90px;font-size:11px;font-family:monospace;border:1.5px solid var(--border);border-radius:4px;padding:4px"
+          placeholder="日付&#9;終値"
+          oninput="S.dowPaste=this.value">${S.dowPaste||''}</textarea>
+        <div style="display:flex;gap:6px;margin-top:4px;align-items:center">
+          <button class="btn btn-blue btn-sm" onclick="applyDowData()">✅ 取り込む</button>
+          <button class="btn btn-outline btn-sm" onclick="S.dowPaste='';S.dowStat=null;R()">クリア</button>
+          <button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red-md)"
+            onclick="if(confirm('NYダウデータをクリアしますか？')){S.extDow={};S.dowStat=null;localStorage.removeItem('katotre_extdow');R()}">🗑</button>
+        </div>
+        ${S.dowStat?`<div style="font-size:10px;margin-top:4px;padding:3px 8px;border-radius:4px;font-weight:700;background:${S.dowStat.type==='ok'?'var(--green-lt)':'var(--red-lt)'};color:${S.dowStat.type==='ok'?'var(--green)':'var(--red)'}">${S.dowStat.msg}</div>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function rTable(days){
+  const filtered=hasAnyPrice()?days.filter(d=>S.prices[ds(d)]):days;
+  const revDstrs=C.revDstrs;
+
+  const rows=filtered.map((d,i)=>{
+    const dstr=ds(d);
+    const rev=revDstrs.has(dstr);
+    const price=S.prices[dstr]||null;
+    const prevPrice = i>0 ? (S.prices[ds(filtered[i-1])]||null) : null;
+    const prevRev   = i>0 ? revDstrs.has(ds(filtered[i-1])) : false;
+
+    let dfH='';
+    if(rev&&prevRev&&price&&prevPrice){
+      const df=price-prevPrice;const cl=df>0?'up':df<0?'dn':'';
+      dfH=`<span class="${cl}">${df>0?'+':''}${fn(df)}</span>`;
+    }
+
+    const ord=S.orders[dstr]||{};
+    const bo=ord.buyId!=null;const so=ord.sellId!=null;
+    const _boe=bo?entryById(ord.buyId):null;
+    const boSettled=bo&&_boe&&_boe.settled===true;
+    const _soe=so?entryById(ord.sellId):null;
+    const soSettled=so&&_soe&&_soe.settled===true;
+
+    const pr=rev?dayProfit(dstr):null;
+    let prH='';
+    if(pr!==null){const cl=pr>0?'ppos':pr<0?'pneg':'';prH=`<span class="${cl}">${pr>0?'+':''}${fn(Math.round(pr))}</span>`;}
+
+    const hasAuto=(S.settles[dstr]||[]).some(s=>s.auto);
+
+    var predH='';
+    var predData=null;
+    if(rev){
+      if(dstr===C.lastD){predData=predictNextDay();}
+      else {predData=S.predLog[dstr]||null;}
+      if(predData){
+        var lv5=classify5Level(predData);
+        var subH='';
+        if(dstr===C.lastD){
+          var parts2=[];
+          if(predData.score!=null)parts2.push((predData.score>=0?'+':'')+predData.score+'点');
+          if(predData.bayesProb!=null)parts2.push(predData.bayesProb+'%');
+          if(parts2.length)subH='<div style="font-size:8px;color:var(--sub);line-height:1.3">'+parts2.join(' ')+'</div>';
+          if(predData.accumSignal>0) subH+='<div style="font-size:8px;font-weight:900;color:var(--red);background:var(--red-lt);border-radius:3px;padding:0 4px;margin-top:1px">🏦仕込みフェーズ↑</div>';
+          else if(predData.accumSignal<0) subH+='<div style="font-size:8px;font-weight:900;color:var(--blue);background:var(--blue-lt);border-radius:3px;padding:0 4px;margin-top:1px">🏦分配フェーズ↓</div>';
+          if(predData.distributionSignal<0) subH+='<div style="font-size:8px;font-weight:900;color:var(--blue);background:var(--blue-lt);border-radius:3px;padding:0 4px;margin-top:1px">🚨売り抜け検出↓</div>';
+          if(predData.osimePullback) subH+='<div style="font-size:9px;font-weight:900;color:var(--red);background:var(--red-lt);border-radius:3px;padding:1px 5px;margin-top:2px">🎯 押し目ゾーン↑</div>';
+          else if(predData.modoriSell) subH+='<div style="font-size:9px;font-weight:900;color:var(--blue);background:var(--blue-lt);border-radius:3px;padding:1px 5px;margin-top:2px">🎯 戻り売りゾーン↓</div>';
+          if(predData.maCross){
+            var mcLabel=predData.maCross==='GC75'?'🌟GC 25×75':predData.maCross==='DC75'?'💀DC 25×75':predData.maCross==='GC25'?'✨GC 5×25':'🔻DC 5×25';
+            var mcIsUp=predData.maCross.indexOf('GC')===0;
+            var mcCl=mcIsUp?'var(--red)':'var(--blue)';var mcBg=mcIsUp?'#FFEBEE':'#E3F2FD';
+            subH='<div style="font-size:9px;font-weight:900;color:'+mcCl+';background:'+mcBg+';border-radius:3px;padding:1px 5px;margin-bottom:1px">'+mcLabel+'</div>'+subH;
+          }
+        } else {
+          if(predData.maCross){var mcL2=predData.maCross;var mcIsUp2=predData.maCross.indexOf('GC')===0;subH='<div style="font-size:7px;font-weight:700;color:'+(mcIsUp2?'var(--red)':'var(--blue)')+'">'+mcL2+'</div>';}
+        }
+        var predOpacity=dstr===C.lastD?'1':'0.55';
+        var lvLabel=lv5?('<span style="font-weight:'+lv5.fw+';font-size:'+lv5.sz+';color:'+lv5.cl+'">'+lv5.emoji+' '+lv5.label+'</span>'):'';
+        predH='<div style="opacity:'+predOpacity+'">'+lvLabel+subH+'</div>';
+      }
+    }
+
+    var hlH='';
+    if(rev&&price&&C.monthHi&&C.monthLo&&C.monthHi>C.monthLo){
+      var hlRange=C.monthHi-C.monthLo;
+      var hlPos=Math.max(0,Math.min(100,Math.round((price-C.monthLo)/hlRange*100)));
+      hlH='<div style="display:flex;align-items:center;gap:2px;font-size:8px;white-space:nowrap">'
+        +'<span style="color:var(--blue);font-weight:700">L</span>'
+        +'<div style="position:relative;width:46px;height:6px;background:linear-gradient(to right,var(--blue-lt),var(--red-lt));border-radius:3px;border:1px solid var(--border)">'
+        +'<div style="position:absolute;top:50%;left:'+hlPos+'%;transform:translate(-50%,-50%);width:7px;height:7px;background:#333;border-radius:50%;border:1.5px solid #fff;z-index:1"></div>'
+        +'</div>'
+        +'<span style="color:var(--red);font-weight:700">H</span>'
+        +'</div>'
+        +'<div style="font-size:8px;color:var(--sub);text-align:center">'+hlPos+'%</div>';
+      if(dstr===C.lastD&&predData){
+        if(predData.maPosition==='perfect_up') hlH+='<div style="font-size:8px;font-weight:700;color:var(--red);background:var(--red-lt);border-radius:3px;padding:1px 5px;margin-top:2px">📶 完全上昇配列</div>';
+        else if(predData.maPosition==='perfect_down') hlH+='<div style="font-size:8px;font-weight:700;color:var(--blue);background:var(--blue-lt);border-radius:3px;padding:1px 5px;margin-top:2px">📉 完全下降配列</div>';
+        if(predData.ma25Dev!==null){var devV=predData.ma25Dev;var devCl=devV>3?'var(--red)':devV<-3?'var(--blue)':'var(--sub)';var devSign=devV>=0?'+':'';hlH+='<div style="font-size:8px;color:'+devCl+'">MA25乖離'+devSign+devV+'%</div>';}
+        if(predData.isTrend) hlH+='<div style="font-size:8px;color:var(--purple);font-weight:700;margin-top:1px">⚡トレンド強</div>';
+        else if(predData.isQuiet) hlH+='<div style="font-size:8px;color:var(--gray);font-weight:700;margin-top:1px">💤静/レンジ</div>';
+      }
+    }
+
+    return `<tr>
+      <td class="cd">${fd(dstr)}${hasAuto?`<span class="expiry-warn">⚠自動</span>`:''}</td>
+      <td class="cp">${rev?`<span>${price?fn(price):'—'}</span>`:`<span class="ph">${price?fn(price):'——'}</span>`}</td>
+      <td class="cdf">${dfH}</td>
+      <td class="cob">
+        <button class="ord-btn ${bo?'ob':''}" onclick="toggleOrder('${dstr}','buy')" style="${boSettled?'text-decoration:line-through;opacity:.5':''}">${bo?'○':''}</button>
+        ${!bo?r3pctAlert(dstr,'buy'):'<div style="font-size:8px;height:16px"></div>'}
+      </td>
+      <td class="cos">
+        <button class="ord-btn ${so?'os':''}" onclick="toggleOrder('${dstr}','sell')" style="${soSettled?'text-decoration:line-through;opacity:.5':''}">${so?'×':''}</button>
+        ${!so?r3pctAlert(dstr,'sell'):'<div style="font-size:8px;height:16px"></div>'}
+      </td>
+      <td class="cs">${rSettleCell(dstr,rev,price)}</td>
+      <td class="cpr">${prH}</td>
+      <td class="cpd" style="text-align:center">${predH}</td>
+      <td class="chl" style="text-align:center">${hlH}</td>
+    </tr>`;
+  }).join('');
+
+  const hiddenCount = hasAnyPrice() ? days.length - filtered.length : 0;
+  const hiddenNote = hiddenCount>0?`<div style="font-size:10px;color:var(--sub);padding:4px 10px">※ 終値データなし ${hiddenCount}日は非表示</div>`:'';
+
+  return `<table class="trade">
+    <thead><tr>
+      <th class="cd">日付</th><th class="cp">終値</th><th class="cdf">前日差</th>
+      <th class="cob">○買</th><th class="cos">×売</th>
+      <th class="cs">決済ポジション</th><th class="cpr">利益幅(円)</th>
+      <th class="cpd">翌日予測</th><th class="chl">H-●-L</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>${hiddenNote}`;
+}
+
+function rHighLow(days){
+  const revDstrs=C.revDstrs||new Set(days.slice(0,S.revealed).map(d=>ds(d)));
+  const mPrices=[];
+  revDstrs.forEach(dstr=>{if(S.prices[dstr])mPrices.push({dstr,price:S.prices[dstr]});});
+  if(!mPrices.length)return '';
+  mPrices.sort((a,b)=>b.price-a.price);
+  const mHi=mPrices[0];const mLo=mPrices[mPrices.length-1];
+
+  return `<div class="card">
+    <div style="display:flex;flex-wrap:wrap;align-items:stretch;gap:0">
+      <div style="padding:5px 14px;background:#FFF5F5;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;gap:3px">
+        <div style="font-size:10px;font-weight:700;color:var(--sub)">📅 月間</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:10px;color:var(--red)">最高</span>
+          <span style="font-size:15px;font-weight:700;color:var(--red)">${fn(mHi.price)}円</span>
+          <span style="font-size:10px;color:var(--sub)">${fd(mHi.dstr)}</span>
+          <span style="font-size:10px;color:var(--sub);margin:0 4px">／</span>
+          <span style="font-size:10px;color:var(--blue)">最安</span>
+          <span style="font-size:15px;font-weight:700;color:var(--blue)">${fn(mLo.price)}円</span>
+          <span style="font-size:10px;color:var(--sub)">${fd(mLo.dstr)}</span>
+          ${mHi.price!==mLo.price?`<span style="font-size:10px;color:var(--sub);margin-left:6px">値幅 <b>${fn(mHi.price-mLo.price)}円</b></span>`:''}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function calcThreshold(basePrice, pct){return Math.round(basePrice * (pct/100));}
+
+function checkRulePct(dstr, type){
+  if(!S.rule3On)return null;
+  const same=(C.open||openEgi()).filter(e=>e.type===type&&e.price);
+  if(!same.length)return null;
+  const curP=S.prices[dstr]||null;if(!curP)return null;
+  const pct=S.rule3Pct||3;
+  let ngBase=null,ngDiff=null,ngNeed=null;
+  for(const e of same){
+    const base=e.price;const threshold=calcThreshold(base,pct);const diff=Math.abs(curP-base);
+    if(diff<threshold){if(ngBase===null||diff<ngDiff){ngBase=base;ngDiff=Math.round(diff);ngNeed=threshold;}}
+  }
+  if(ngBase!==null)return {ok:false,base:ngBase,curP,diff:ngDiff,need:ngNeed,pct,type};
+  const closest=same.reduce((a,b)=>Math.abs((b.price||0)-curP)<Math.abs((a.price||0)-curP)?b:a);
+  const base=closest.price;const diff=Math.round(Math.abs(curP-base));const need=calcThreshold(base,pct);
+  return {ok:true,base,curP,diff,need,pct,type};
+}
+
+function r3pctAlert(dstr, type){
+  if(!(C.revDstrs||new Set()).has(dstr))return '';
+  const r=checkRulePct(dstr,type);if(!r)return '';
+  if(r.ok)return `<div style="font-size:8px;color:#0057B8;font-weight:700;line-height:1.2">+${fn(r.diff)}円</div>`;
+  const remaining=r.need-r.diff;
+  return `<div style="font-size:8px;color:#C62828;font-weight:700;line-height:1.2">-${fn(remaining)}円</div>`;
+}
+
+function rSettleCell(dstr,rev,curPrice){
+  const ss=S.settles[dstr]||[];const sh=C.sh;
+  const list=ss.map(s=>{
+    const e=entryById(s.posId);if(!e)return '';
+    const tCl=e.type==='buy'?'tb':'ts';const tLb=e.type==='buy'?'○':'×';
+    const pr=e.price&&s.exitPrice?(e.type==='buy'?s.exitPrice-e.price:e.price-s.exitPrice)*sh:null;
+    const prStr=pr!==null?`<span class="${pr>=0?'ppos':'pneg'}" style="font-size:10px">${pr>=0?'+':''}${fn(Math.round(pr))}円</span>`:'';
+    return `<div class="si ${s.auto?'auto-si':''}">
+      ${s.auto?`<span class="auto-tag">⚠6ヶ月</span>`:''}
+      <span class="${tCl}">${tLb}</span>
+      <span>${fd(e.date)}</span>
+      <span style="color:var(--sub)">${e.price?fn(e.price):'-'}</span>→
+      <span style="font-weight:700">${fn(s.exitPrice)}</span>
+      ${prStr}
+      <button class="brm" onclick="rmSettle('${dstr}',${s.id})" title="削除">✕</button>
+    </div>`;
+  }).join('');
+
+  const open=C.open;
+  const canAdd=rev&&open.length>0&&S.sfDs!==dstr;
+  const formOpen=S.sfDs===dstr;
+  return `<div>
+    <div class="sl">${list}</div>
+    ${canAdd?`<button class="btn btn-blue btn-xs" style="margin-top:2px" onclick="openSF('${dstr}')">＋ 決済追加</button>`:''}
+    ${formOpen?rSettleForm(dstr,curPrice):''}
+  </div>`;
+}
+
+function rSettleForm(dstr,curPrice){
+  const lastD=C.lastD;const open=C.open;const sh_sf=C.sh;
+  const sortedOpen=[...open].sort((a,b)=>(b.price||0)-(a.price||0));
+  const pItems=sortedOpen.map(e=>{
+    const tCl=e.type==='buy'?'tb':'ts';const tLb=e.type==='buy'?'○':'×';
+    const isSel=S.selPosArr.indexOf(e.id)>=0;
+    const isExpired=lastD&&isExp(e.date,lastD);
+    const expStr=isExpired?`<span style="color:var(--red);font-size:9px;font-weight:700">⚠期限超過</span>`:`<span style="font-size:9px;color:var(--sub)">期限:${fd(addM6(e.date))}</span>`;
+    let plH='';
+    if(e.price&&curPrice){const pl=Math.round((e.type==='buy'?curPrice-e.price:e.price-curPrice)*sh_sf);const plCl=pl>0?'ppos':pl<0?'pneg':'';plH=`<span class="${plCl}" style="font-size:10px;font-weight:700;min-width:58px;text-align:right">${pl>=0?'+':''}${fn(pl)}円</span>`;}
+    return `<div class="pi2 ${isSel?'sel':''} ${isExpired?'expiring':''}" onclick="togglePosF(${e.id})">
+      <input type="checkbox" ${isSel?'checked':''} onclick="event.stopPropagation();togglePosF(${e.id})" style="width:14px;height:14px;cursor:pointer;flex-shrink:0">
+      <span class="${tCl}">${tLb}</span>
+      <span>${fd(e.date)}</span>
+      <span>${e.price?fn(e.price)+'円':'—'}</span>
+      ${expStr}
+      <span style="font-size:9px;color:var(--muted)">${NUMS[e.gi]}</span>
+      ${plH}
+    </div>`;
+  }).join('');
+
+  const selCount=S.selPosArr.length;
+  return `<div class="sf">
+    <div style="font-weight:700;margin-bottom:4px">決済するポジション
+      ${selCount>0?`<span style="font-size:10px;color:var(--blue);font-weight:700;margin-left:6px">${selCount}件選択中</span>`:''}
+    </div>
+    <div class="pl">${pItems}</div>
+    <div class="row2">
+      <span>決済価格:</span>
+      <input type="number" value="${S.exitInp||curPrice||''}" placeholder="${curPrice||'価格入力'}" oninput="S.exitInp=this.value">
+      <span style="font-size:10px;color:var(--sub)">円</span>
+    </div>
+    <div class="btns">
+      <button class="btn btn-blue btn-sm" onclick="confirmSettle()">✅ 確定</button>
+      <button class="btn btn-green btn-sm" onclick="confirmAllSettle()">⚡ 全決済</button>
+      <button class="btn btn-outline btn-sm" onclick="closeSF()">キャンセル</button>
+    </div>
+  </div>`;
+}
+
+function rMemo(){
+  const lastD=C.lastD;const sh=C.sh;const autoStlIds=C.autoStlIds;
+
+  const gcards=S.groups.map((g,gi)=>{
+    const isCur=gi===S.gi;
+    const dispB=calcGroupDisp(gi,'buy').slice(0,7);
+    const dispS=calcGroupDisp(gi,'sell').slice(0,7);
+    const allDisp=[...dispB,...dispS];
+    const ownAll=[...S.groups[gi].buys,...S.groups[gi].sells];
+    const isDone=ownAll.length>0&&allDisp.every(e=>e.settled);
+
+    const rows=[];
+    let bi2=0,si2=0;
+    while(rows.length<5&&(bi2<dispB.length||si2<dispS.length)){
+      const bp=bi2<dispB.length?(dispB[bi2].price||0):null;
+      const sp=si2<dispS.length?(dispS[si2].price||0):null;
+      if(bp!==null&&sp!==null&&bp===sp){rows.push({buy:dispB[bi2++],sell:dispS[si2++]});}
+      else if(bp!==null&&(sp===null||bp>sp)){rows.push({buy:dispB[bi2++],sell:null});}
+      else {rows.push({buy:null,sell:dispS[si2++]});}
+    }
+    while(rows.length<7)rows.push({buy:null,sell:null});
+
+    const mkCell=(e,colType)=>{
+      if(!e)return '<div class="ge"></div>';
+      const isExpired=lastD&&isExp(e.date,lastD);
+      const isAutoStl=e.settled&&autoStlIds.has(e.id);
+      const _sgi=e.settled&&C.settleGiMap?C.settleGiMap.get(e.id):undefined;
+      const isOwnGi=e.settled&&(_sgi===gi||_sgi===-1);
+      let fukumiH='';
+      if(e.price){
+        let refP=null;
+        if(e.settled&&isOwnGi){refP=C.settleExitMap&&C.settleExitMap.get(e.id)||null;}
+        else if(!e.settled&&C.curP){refP=C.curP;}
+        if(refP){
+          const diff=colType==='buy'?refP-e.price:e.price-refP;const val=Math.round(diff*sh);const cl=val>0?'ppos':val<0?'pneg':'';
+          fukumiH=`<div class="ge-fukumi ${cl}">(${val>0?'+':''}${fn(val)})</div>`;
+        }
+      }
+      return `<div class="ge has ${e.settled&&isOwnGi?'stl':''} ${isAutoStl&&isOwnGi?'auto-stl':''} ${colType}-e">
+        <div class="ged">${fd(e.date)}</div>
+        <div class="gep">${e.price?fn(e.price):'&#x2014;'}</div>
+        ${fukumiH}
+        ${!e.settled&&isExpired?'<div class="ge-exp">&#x26A0;&#x671F;&#x9650;</div>':''}
+      </div>`;
+    };
+
+    const rowsH=rows.map(r=>`
+      <div style="display:grid;grid-template-columns:1fr 1fr">
+        <div style="border-right:1px solid #E8EDF2">${mkCell(r.buy,'buy')}</div>
+        <div>${mkCell(r.sell,'sell')}</div>
+      </div>`).join('');
+
+    return `<div class="gc ${isCur?'cur':''} ${isDone?'done':''}">
+      <div class="gh">
+        <span>${NUMS[gi]}</span>
+        <span style="display:flex;gap:3px;align-items:center">
+          ${isCur?'<span class="badge badge-orange">現在</span>':''}
+          ${isDone?'<span class="badge badge-green">済</span>':''}
+        </span>
+      </div>
+      <div class="gc-cols">
+        <div class="gch buy">○買い</div>
+        <div class="gch sell">×売り</div>
+      </div>
+      ${rowsH}
+      <div style="padding:3px 5px;border-top:1px solid var(--border)">
+        <input type="text" style="width:100%;font-size:10px;border:1px solid var(--border);border-radius:3px;padding:2px 5px;background:#FAFBFC"
+          placeholder="メモ..."
+          value="${(S.groupMemos[gi]||'').replace(/"/g,'&quot;')}"
+          oninput="S.groupMemos[${gi}]=this.value">
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<div class="card">
+    <div class="memo-top">
+      <div class="memo-title">📋 ポジションメモ欄</div>
+      <div class="memo-meta">
+        <div class="ctrl"><label>元金</label>
+          <input type="number" style="width:82px" value="${S.capital}" placeholder="万円" oninput="S.capital=this.value"> <span>万円</span>
+        </div>
+        <div class="ctrl"><label>1P株数</label>
+          <input type="number" style="width:72px" value="${S.shares}" placeholder="株" oninput="S.shares=this.value"> <span>株</span>
+        </div>
+        <span style="font-size:12px;font-weight:700;color:var(--orange)">現在: ${NUMS[S.gi]}</span>
+        <button class="btn btn-outline btn-sm" onclick="prevGrp()" ${S.gi<=0?'disabled':''}>◄前</button>
+        <button class="btn btn-outline btn-sm" onclick="advGrp()" ${S.gi>=11?'disabled':''}>次►</button>
+      </div>
+    </div>
+    <div class="g-grid">${gcards}</div>
+  </div>`;
+}
+
+function rSosai(){
+  const lastD=C.lastD;const curP=C.curP;const sh=C.sh;
+
+  const open=[
+    ...calcGroupDisp(S.gi,'buy').filter(e=>!e.settled).map(e=>({...e,colType:'buy'})),
+    ...calcGroupDisp(S.gi,'sell').filter(e=>!e.settled).map(e=>({...e,colType:'sell'}))
+  ].sort((a,b)=>(b.price||0)-(a.price||0));
+
+  const n=Math.min(open.length,7);const pos=open.slice(0,n);const LABS='ABCDEFGHIJ'.split('');
+
+  const buys=pos.filter(e=>e.colType==='buy');const sells=pos.filter(e=>e.colType==='sell');
+  const fixedPairs=[];
+  buys.forEach(b=>{sells.forEach(s=>{const diff=(s.price||0)-(b.price||0);fixedPairs.push({buy:b,sell:s,diff,type:diff>0?'rieki':diff<0?'son':'doji'});});});
+  fixedPairs.sort((a,b)=>b.diff-a.diff);
+
+  const sonTotal=fixedPairs.filter(p=>p.type==='son').reduce((s,p)=>s+p.diff*sh,0);
+  const riekiTotal=fixedPairs.filter(p=>p.type==='rieki').reduce((s,p)=>s+p.diff*sh,0);
+
+  let settledProfit=0;
+  const curGiPosIds=new Set([...calcGroupDisp(S.gi,'buy'),...calcGroupDisp(S.gi,'sell')].map(e=>e.id));
+  for(const dstr of Object.keys(S.settles)){
+    const ss=S.settles[dstr]||[];
+    for(const s of ss){
+      if(!curGiPosIds.has(s.posId))continue;
+      const e=entryById(s.posId);if(!e||!e.price||!s.exitPrice)continue;
+      settledProfit+=(e.type==='buy'?s.exitPrice-e.price:e.price-s.exitPrice)*sh;
+    }
+  }
+
+  function rFixedSection(){
+    if(!fixedPairs.length)return '';
+    const rows=fixedPairs.map(p=>{
+      const typeLabel=p.type==='rieki'?'利益固定':p.type==='son'?'損失固定':'同値固定';
+      const typeCls='kf-'+p.type;const amtCl=p.diff>0?'ppos':p.diff<0?'pneg':'';const amtVal=p.diff*sh;
+      return `<div class="kf-row">
+        <span class="kf-badge ${typeCls}">${typeLabel}</span>
+        <span class="tb">○${fn(p.buy.price)}</span>
+        <span style="color:var(--muted)">×</span>
+        <span class="ts">×${fn(p.sell.price)}</span>
+        <span class="kf-amount ${amtCl}" style="min-width:70px">${p.diff>=0?'+':''}${fn(amtVal)}円</span>
+      </div>`;
+    }).join('');
+    return `<div class="kf-section">
+      <div class="kf-title" style="cursor:pointer" onclick="S.fixedOpen=!S.fixedOpen;R()">
+        🔒 固定判定
+        <span style="margin-left:auto;font-size:10px;background:#EEF2F6;padding:1px 8px;border-radius:4px;color:var(--sub)">${S.fixedOpen?'▲ 閉じる':'▼ 詳細'}</span>
+      </div>
+      ${S.fixedOpen?`<div>${rows}</div>`:''}
+    </div>`;
+  }
+
+  function rComboSection(){
+    if(n<2)return '';
+    const combos=[];
+    for(let mask=0;mask<(1<<n);mask++){
+      const bits=[];for(let i=0;i<n;i++) if(mask&(1<<i)) bits.push(i);
+      if(bits.length>=2) combos.push(bits);
+    }
+    function calcCombo(bits){
+      const ps=bits.map(i=>pos[i]);const label=bits.map(i=>LABS[i]).join('+');
+      const bs=ps.filter(e=>e.colType==='buy');const ss=ps.filter(e=>e.colType==='sell');
+      const buysSum=bs.reduce((s,e)=>s+(e.price||0),0);const sellsSum=ss.reduce((s,e)=>s+(e.price||0),0);
+      const netCount=bs.length-ss.length;
+      const posStr=ps.map(e=>{const cl=e.colType==='buy'?'tb':'ts';const mk=e.colType==='buy'?'○':'×';return '<span class="'+cl+'">'+mk+fn(e.price)+'</span>';}).join('<span style="color:var(--muted);margin:0 1px">+</span>');
+      let resH='',sortKey=0;
+      if(netCount===0){const fixed=sellsSum-buysSum;const cl=fixed>=0?'ppos':'pneg';resH='<span class="sosai-res '+cl+'">'+(fixed>=0?'+':'')+fn(fixed*sh)+'円</span>';sortKey=fixed;}
+      else if(netCount>0){const be=Math.round((buysSum-sellsSum)/netCount);const ok=curP&&curP>be;const prof1=ok?Math.round((curP-be)*netCount*sh):null;resH='<span class="sosai-res '+(ok?'sosai-ok':'sosai-ng')+'">'+fn(be)+'↑'+(ok?'✓達成':'')+'</span>';sortKey=curP?(curP>be?Math.round((curP-be)*netCount*sh):-(be-curP)*netCount*sh):0;}
+      else {const be=Math.round((sellsSum-buysSum)/(-netCount));const ok=curP&&curP<be;resH='<span class="sosai-res '+(ok?'sosai-ok':'sosai-ng')+'">'+fn(be)+'↓'+(ok?'✓達成':'')+'</span>';sortKey=curP?(curP<be?Math.round((be-curP)*(-netCount)*sh):-(curP-be)*(-netCount)*sh):0;}
+      return {label,posStr,resH,size:bits.length,sortKey};
+    }
+    const bySize={};
+    combos.forEach(bits=>{const r=calcCombo(bits);if(!bySize[r.size])bySize[r.size]=[];bySize[r.size].push(r);});
+    Object.values(bySize).forEach(rs=>rs.sort((a,b)=>b.sortKey-a.sortKey));
+    const sections=Object.entries(bySize).map(([sz,rs])=>`
+      <div class="sosai-group">
+        <div class="sosai-group-title" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">${sz}点相殺 (${rs.length}件)</div>
+        <div class="sosai-body">
+          ${rs.map(r=>`<div class="sosai-row"><span class="sosai-lbl">${r.label}</span><span class="sosai-pos">${r.posStr}</span>${r.resH}</div>`).join('')}
+        </div>
+      </div>`).join('');
+    const legend=pos.map((e,i)=>{const cl=e.colType==='buy'?'tb':'ts';const mk=e.colType==='buy'?'○':'×';return `<span style="margin-right:8px"><b>${LABS[i]}</b>:<span class="${cl}">${mk}</span>${fd(e.date)} ${fn(e.price)}円</span>`;}).join('');
+    return `<div class="kf-section" style="padding-bottom:0;border-bottom:none">
+      <div class="kf-title">🔀 相殺シミュレーション <span style="font-size:10px;color:var(--sub);font-weight:400">${legend}</span>
+        ${curP?`<span style="margin-left:auto;font-size:11px">現在値: <b>${fn(curP)}円</b></span>`:''}
+      </div>
+      <div class="sosai-wrap" style="padding:0 0 8px 0">${sections}</div>
+    </div>`;
+  }
+
+  const hasContent=n>=2||fixedPairs.length>0;
+  if(!hasContent)return `<div class="card"><div class="ch">⚖️ 相殺・固定管理</div><div class="cb" style="color:var(--sub);font-size:11px">未決済2件以上で表示</div></div>`;
+
+  return `<div class="card">
+    <div class="ch">⚖️ 相殺・固定管理 <span style="font-size:10px;color:var(--sub);font-weight:400">グループ ${NUMS[S.gi]}</span></div>
+    ${rFixedSection()}
+    ${rComboSection()}
+  </div>`;
+}
+
+function rBottom(){
+  const mp=monthProfit();const prev=Number(S.prevP)||0;const total=prev+Math.round(mp);
+  const mcl=mp>0?'ppos':mp<0?'pneg':'';const tcl=total>0?'ppos':total<0?'pneg':'';
+  return `<div class="card">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;border-bottom:1px solid var(--border)">
+      <div style="padding:8px 16px;border-right:1px solid var(--border);display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;font-weight:700;color:var(--sub);white-space:nowrap">📊 今月利益確定</span>
+        <span class="tbig ${mcl}" style="font-size:16px">${mp!==0?(mp>0?'+':'')+fn(Math.round(mp))+'円':'0円'}</span>
+      </div>
+      <div style="padding:8px 16px;border-right:1px solid var(--border);display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;font-weight:700;color:var(--sub);white-space:nowrap">先月までの累計</span>
+        <input type="number" style="width:110px;text-align:right" value="${S.prevP}" placeholder="0" oninput="S.prevP=this.value;R()">
+        <span style="font-size:12px">円</span>
+      </div>
+      <div style="padding:8px 16px;border-right:1px solid var(--border);display:flex;align-items:center;gap:6px">
+        <span class="op" style="font-size:16px">＋</span>
+        <span class="tbig ${mcl}">${fn(Math.round(mp))}円</span>
+        <span class="op" style="font-size:16px">＝</span>
+      </div>
+      <div style="padding:8px 16px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;font-weight:700;color:var(--sub)">累計</span>
+        <span class="tbig ${tcl}" style="font-size:20px">${fn(total)}円</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+lsLoadMeta();
+lsLoadPrices();
+lsLoadExt();
+if(!lsLoadMonth(S.year,S.month)){
+  resetMonthData();
+  applyCarryOver(S.year,S.month);
+  const pp=calcPrevMonthProfit(S.year,S.month);
+  if(pp&&!S.prevP)S.prevP=String(pp);
+}
+R();
+</script>
+</body>
+</html>
